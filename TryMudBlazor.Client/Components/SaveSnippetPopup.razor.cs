@@ -4,15 +4,18 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
     using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
+    using MudBlazor;
 
     public partial class SaveSnippetPopup : IDisposable
     {
         private DotNetObjectReference<SaveSnippetPopup> dotNetInstance;
+
+        [Inject]
+        public ISnackbar Snackbar { get; set; }
 
         [Inject]
         public IJSInProcessRuntime JsRuntime { get; set; }
@@ -38,9 +41,6 @@
         [Parameter]
         public Action UpdateActiveCodeFileContentAction { get; set; }
 
-        [CascadingParameter]
-        private PageNotifications PageNotificationsComponent { get; set; }
-
         private bool Loading { get; set; }
 
         private string SnippetLink { get; set; }
@@ -56,7 +56,6 @@
         public void Dispose()
         {
             this.dotNetInstance?.Dispose();
-            this.PageNotificationsComponent?.Dispose();
 
             this.JsRuntime.InvokeVoid("App.SaveSnippetPopup.dispose");
         }
@@ -104,13 +103,11 @@
             }
             catch (InvalidOperationException ex)
             {
-                this.PageNotificationsComponent.AddNotification(NotificationType.Error, content: ex.Message);
+                Snackbar.Add(ex.Message, Severity.Error);
             }
             catch (Exception)
             {
-                this.PageNotificationsComponent.AddNotification(
-                    NotificationType.Error,
-                    content: "Error while saving snippet. Please try again later.");
+                Snackbar.Add("Error while saving snippet. Please try again later.", Severity.Error);
             }
             finally
             {

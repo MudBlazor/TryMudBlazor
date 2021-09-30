@@ -1,13 +1,12 @@
 ﻿namespace TryMudBlazor.Client.Components
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
     using Microsoft.AspNetCore.Components;
+    using MudBlazor;
 
-    public partial class TabManager : IDisposable
+    public partial class TabManager
     {
         private const int DefaultActiveIndex = 0;
 
@@ -29,17 +28,12 @@
         [Parameter]
         public EventCallback<string> OnTabCreate { get; set; }
 
-        [CascadingParameter]
-        private PageNotifications PageNotificationsComponent { get; set; }
+        [Inject]
+        public ISnackbar Snackbar { get; set; }
 
         private int ActiveIndex { get; set; } = DefaultActiveIndex;
 
         private string TabCreatingDisplayStyle => this.tabCreating ? string.Empty : "display: none;";
-
-        public void Dispose()
-        {
-            this.PageNotificationsComponent?.Dispose();
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -108,13 +102,12 @@
                 return;
             }
 
-            // TODO: Abstract to not use "code file" stuff
             var normalizedTab = CodeFilesHelper.NormalizeCodeFilePath(this.newTab, out var error);
             if (!string.IsNullOrWhiteSpace(error) || this.Tabs.Contains(normalizedTab))
             {
                 if (this.previousInvalidTab != this.newTab)
                 {
-                    this.PageNotificationsComponent.AddNotification(NotificationType.Error, error ?? "File already exists.");
+                    Snackbar.Add("File already exists.", Severity.Warning);
                     this.previousInvalidTab = this.newTab;
                 }
 

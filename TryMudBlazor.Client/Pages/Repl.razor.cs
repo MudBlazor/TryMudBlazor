@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Components;
-    using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
     using Try.Core;
     using Microsoft.AspNetCore.Components;
@@ -22,6 +21,9 @@
         private DotNetObjectReference<Repl> dotNetInstance;
         private string errorMessage;
         private CodeFile activeCodeFile;
+
+        [Inject]
+        public ISnackbar Snackbar { get; set; }
 
         [Inject]
         public SnippetsService SnippetsService { get; set; }
@@ -41,9 +43,6 @@
         public CodeEditor CodeEditorComponent { get; set; }
 
         public IDictionary<string, CodeFile> CodeFiles { get; set; } = new Dictionary<string, CodeFile>();
-
-        [CascadingParameter]
-        private PageNotifications PageNotificationsComponent { get; set; }
 
         private IList<string> CodeFileNames { get; set; } = new List<string>();
 
@@ -93,8 +92,6 @@
         public void Dispose()
         {
             this.dotNetInstance?.Dispose();
-            this.PageNotificationsComponent?.Dispose();
-
             this.JsRuntime.InvokeVoid("App.Repl.dispose");
         }
 
@@ -112,10 +109,9 @@
                     this.dotNetInstance);
             }
 
-            if (!string.IsNullOrWhiteSpace(this.errorMessage) && this.PageNotificationsComponent != null)
+            if (!string.IsNullOrWhiteSpace(this.errorMessage))
             {
-                this.PageNotificationsComponent.AddNotification(NotificationType.Error, content: this.errorMessage);
-
+                Snackbar.Add(this.errorMessage, Severity.Error);
                 this.errorMessage = null;
             }
 
@@ -124,10 +120,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            // Uncomment for debug adapter to have time to connect (known issue)
-            // Otherwise breakpoint will not be hit
-            // await Task.Delay(10000);
-            this.PageNotificationsComponent?.Clear();
+            Snackbar.Clear();
 
             if (!string.IsNullOrWhiteSpace(this.SnippetId))
             {
@@ -198,7 +191,7 @@
             }
             catch (Exception)
             {
-                this.PageNotificationsComponent.AddNotification(NotificationType.Error, content: "Error while compiling the code.");
+                Snackbar.Add("Error while compiling the code.", Severity.Error);
             }
             finally
             {
@@ -277,7 +270,7 @@
         {
             if (this.activeCodeFile == null)
             {
-                this.PageNotificationsComponent.AddNotification(NotificationType.Error, "No active file to update.");
+                Snackbar.Add("No active file to update.", Severity.Error);
                 return;
             }
 

@@ -5,13 +5,11 @@
     using System.IO;
     using System.IO.Compression;
     using System.Net.Http;
-    using System.Net.Http.Json;
     using System.Text;
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Models;
     using Try.Core;
     using Microsoft.AspNetCore.Components;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Options;
 
     public class SnippetsService
