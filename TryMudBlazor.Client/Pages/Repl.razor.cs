@@ -8,7 +8,7 @@
     using TryMudBlazor.Client.Components;
     using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.CodeAnalysis;
     using Microsoft.JSInterop;

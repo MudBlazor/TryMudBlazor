@@ -5,7 +5,7 @@
     using System.IO;
     using System.IO.Compression;
     using System.Text;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.WebUtilities;
     using Microsoft.CodeAnalysis.CSharp;
 

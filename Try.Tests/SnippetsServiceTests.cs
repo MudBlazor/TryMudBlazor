@@ -3,7 +3,7 @@ namespace Tests
     using NUnit.Framework;
     using TryMudBlazor.Client.Services;
     using TryMudBlazor.Client.Models;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.Extensions.Options;
     using System.Threading.Tasks;
     using System.Collections.Generic;

@@ -4,7 +4,7 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Components;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.Components;
 
     public partial class MainLayout : IDisposable

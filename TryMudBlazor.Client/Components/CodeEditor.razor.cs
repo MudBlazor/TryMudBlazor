@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
 

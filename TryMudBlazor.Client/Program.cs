@@ -5,7 +5,7 @@ namespace TryMudBlazor.Client
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;

@@ -6,7 +6,7 @@
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
 

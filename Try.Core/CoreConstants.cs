@@ -1,4 +1,4 @@
-﻿namespace BlazorRepl.Core
+﻿namespace Try.Core
 {
     public static class CoreConstants
     {

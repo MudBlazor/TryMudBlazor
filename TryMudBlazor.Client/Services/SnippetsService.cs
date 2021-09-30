@@ -9,7 +9,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Models;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Options;

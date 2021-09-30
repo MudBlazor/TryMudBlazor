@@ -1,7 +1,7 @@
 ﻿namespace TryMudBlazor.Client.Services
 {
     using System;
-    using BlazorRepl.Core;
+    using Try.Core;
     using Microsoft.Extensions.Logging;
     using Microsoft.JSInterop;
 

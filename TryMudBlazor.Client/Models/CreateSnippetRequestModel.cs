@@ -1,7 +1,7 @@
 ﻿namespace TryMudBlazor.Client.Models
 {
     using System.Collections.Generic;
-    using BlazorRepl.Core;
+    using Try.Core;
 
     public class CreateSnippetRequestModel
     {
