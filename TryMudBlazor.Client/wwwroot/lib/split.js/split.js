@@ -1,18 +1,17 @@
-/*! Split.js - v1.6.2 */
+/*! Split.js - v1.5.11 */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
-    (global = global || self, global.Split = factory());
+    (global.Split = factory());
 }(this, (function () { 'use strict';
 
     // The programming goals of Split.js are to deliver readable, understandable and
     // maintainable code, while at the same time manually optimizing for tiny minified file size,
-    // browser compatibility without additional requirements
+    // browser compatibility without additional requirements, graceful fallback (IE8 is supported)
     // and very few assumptions about the user's page layout.
-    var global = typeof window !== 'undefined' ? window : null;
-    var ssr = global === null;
-    var document = !ssr ? global.document : undefined;
+    var global = window;
+    var document = global.document;
 
     // Save a couple long function names that are used frequently.
     // This optimization saves around 400 bytes.
@@ -25,21 +24,23 @@
     var HORIZONTAL = 'horizontal';
     var NOOP = function () { return false; };
 
+    // Figure out if we're in IE8 or not. IE8 will still render correctly,
+    // but will be static instead of draggable.
+    var isIE8 = global.attachEvent && !global[addEventListener];
+
     // Helper function determines which prefixes of CSS calc we need.
     // We only need to do this once on startup, when this anonymous function is called.
     //
     // Tests -webkit, -moz and -o prefixes. Modified from StackOverflow:
     // http://stackoverflow.com/questions/16625140/js-feature-detection-to-detect-the-usage-of-webkit-calc-over-calc/16625167#16625167
-    var calc = ssr
-        ? 'calc'
-        : ((['', '-webkit-', '-moz-', '-o-']
-              .filter(function (prefix) {
-                  var el = document.createElement('div');
-                  el.style.cssText = "width:" + prefix + "calc(9px)";
+    var calc = (['', '-webkit-', '-moz-', '-o-']
+        .filter(function (prefix) {
+            var el = document.createElement('div');
+            el.style.cssText = "width:" + prefix + "calc(9px)";
 
-                  return !!el.style.length
-              })
-              .shift()) + "calc");
+            return !!el.style.length
+        })
+        .shift()) + "calc";
 
     // Helper function checks if its argument is a string-like type
     var isString = function (v) { return typeof v === 'string' || v instanceof String; };
@@ -99,7 +100,11 @@
         var style = {};
 
         if (!isString(size)) {
-            style[dim] = calc + "(" + size + "% - " + gutSize + "px)";
+            if (!isIE8) {
+                style[dim] = calc + "(" + size + "% - " + gutSize + "px)";
+            } else {
+                style[dim] = size + "%";
+            }
         } else {
             style[dim] = size;
         }
@@ -142,8 +147,6 @@
     // 5. Actually size the pair elements, insert gutters and attach event listeners.
     var Split = function (idsOption, options) {
         if ( options === void 0 ) options = {};
-
-        if (ssr) { return {} }
 
         var ids = idsOption;
         var dimension;
@@ -323,7 +326,7 @@
 
             // Call the drag callback continously. Don't do anything too intensive
             // in this callback.
-            getOption(options, 'onDrag', NOOP)(getSizes());
+            getOption(options, 'onDrag', NOOP)();
         }
 
         // Cache some important sizes when drag starts, so we don't have to do that
@@ -634,27 +637,30 @@
             // staticly assigning sizes without draggable gutters. Assigns a string
             // to `size`.
             //
-            // Create gutter elements for each pair.
-            if (i > 0) {
-                var gutterElement = gutter(i, direction, element.element);
-                setGutterSize(gutterElement, gutterSize, i);
+            // IE9 and above
+            if (!isIE8) {
+                // Create gutter elements for each pair.
+                if (i > 0) {
+                    var gutterElement = gutter(i, direction, element.element);
+                    setGutterSize(gutterElement, gutterSize, i);
 
-                // Save bound event listener for removal later
-                pair[gutterStartDragging] = startDragging.bind(pair);
+                    // Save bound event listener for removal later
+                    pair[gutterStartDragging] = startDragging.bind(pair);
 
-                // Attach bound event listener
-                gutterElement[addEventListener](
-                    'mousedown',
-                    pair[gutterStartDragging]
-                );
-                gutterElement[addEventListener](
-                    'touchstart',
-                    pair[gutterStartDragging]
-                );
+                    // Attach bound event listener
+                    gutterElement[addEventListener](
+                        'mousedown',
+                        pair[gutterStartDragging]
+                    );
+                    gutterElement[addEventListener](
+                        'touchstart',
+                        pair[gutterStartDragging]
+                    );
 
-                parent.insertBefore(gutterElement, element.element);
+                    parent.insertBefore(gutterElement, element.element);
 
-                pair.gutter = gutterElement;
+                    pair.gutter = gutterElement;
+                }
             }
 
             setElementSize(
@@ -750,6 +756,13 @@
                     });
                 }
             });
+        }
+
+        if (isIE8) {
+            return {
+                setSizes: setSizes,
+                destroy: destroy,
+            }
         }
 
         return {
