@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="5.0.10" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
-    <PackageReference Include="MudBlazor" Version="5.1.5" />
+    <PackageReference Include="MudBlazor" Version="5.2.0-rc2" />
   </ItemGroup>
 
   <ItemGroup>
