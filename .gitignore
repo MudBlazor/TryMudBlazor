@@ -351,3 +351,6 @@ MigrationBackup/
 /NuGet.Config
 
 Client/Properties/ServiceDependencies/TryMudBlazor - Web Deploy/
+
+# Rider idea folder
+.idea/
