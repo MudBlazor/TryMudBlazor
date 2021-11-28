@@ -8,7 +8,7 @@ We value your input! We want to make contributing to this project as easy and tr
 
 ## We use GitHub [Pull Requests](https://github.com/BlazorRepl/BlazorRepl/pulls) for accepting code changes 
 
-1. Fork the repo and create your branch from `master`.
+1. Fork the repo and create your branch from `main`.
 2. Be consistent with the existing code
 3. Make sure your code passes all code style analyzer checks.
 4. Write a detailed description of the changes you have made. 
