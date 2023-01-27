@@ -110,6 +110,11 @@
                         return $"Main component content should be at least {MainComponentFileContentMinLength} characters long.";
                     }
 
+                    if (codeFile.Content.Contains("@typeparam ", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return "Main.razor component should not contain @typeparam directive. Create components requiring '@typeparam' directive in separate files.";
+                    }
+
                     containsMainComponent = true;
                 }
 
