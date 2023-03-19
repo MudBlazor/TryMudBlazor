@@ -232,37 +232,6 @@ window.App.Repl = window.App.Repl || (function () {
             window.App.CodeEditor.setLanguage(newLanguage);
             window.App.CodeEditor.resize();
         },
-        updateUserAssemblyInCacheStorage: function (rawFileBytes) {
-            if (!rawFileBytes) {
-                return;
-            }
-
-            const fileBytes = Blazor.platform.toUint8Array(rawFileBytes);
-            const response = new Response(
-                new Blob([fileBytes]),
-                {
-                    headers: {
-                        'content-length': fileBytes.length.toString(),
-                        'content-type': 'application/octet-stream'
-                    }
-                });
-
-            caches.open('blazor-resources-/').then(function (cache) {
-                if (!cache) {
-                    // TODO: alert user
-                    return;
-                }
-
-                cache.keys().then(function (keys) {
-                    const keysForDelete = keys.filter(x => x.url.indexOf('UserComponents') > -1);
-
-                    const dll = keysForDelete.find(x => x.url.indexOf('dll') > -1).url.substr(window.location.origin.length);
-                    cache.delete(dll).then(function () {
-                        cache.put(dll, response).then(function () { });
-                    });
-                });
-            });
-        },
         dispose: function () {
             _dotNetInstance = null;
             _editorContainerId = null;
@@ -311,6 +280,58 @@ window.App.SaveSnippetPopup = window.App.SaveSnippetPopup || (function () {
             _id = null;
 
             window.removeEventListener('click', closePopupOnWindowClick);
+        }
+    };
+}());
+
+window.App.CodeExecution = window.App.CodeExecution || (function () {
+    const UNEXPECTED_ERROR_MESSAGE = 'An unexpected error has occurred. Please try again later or contact the team.';
+
+    function putInCacheStorage(cache, fileName, fileBytes, contentType) {
+        const cachedResponse = new Response(
+            new Blob([fileBytes]),
+            {
+                headers: {
+                    'Content-Type': contentType || 'application/octet-stream',
+                    'Content-Length': fileBytes.length.toString()
+                }
+            });
+
+        return cache.put(fileName, cachedResponse);
+    }
+
+    function convertBase64StringToBytes(base64String) {
+        const binaryString = window.atob(base64String);
+
+        const bytesCount = binaryString.length;
+        const bytes = new Uint8Array(bytesCount);
+        for (let i = 0; i < bytesCount; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        return bytes;
+    }
+
+    return {
+        updateUserComponentsDll: async function (fileContent) {
+            if (!fileContent) {
+                return;
+            }
+
+            const cache = await caches.open('blazor-resources-/');
+
+            const cacheKeys = await cache.keys();
+            const userComponentsDllCacheKey = cacheKeys.find(x => x.url.indexOf('Try.UserComponents.dll') > -1);
+            if (!userComponentsDllCacheKey || !userComponentsDllCacheKey.url) {
+                alert(UNEXPECTED_ERROR_MESSAGE);
+                return;
+            }
+
+            const dllPath = userComponentsDllCacheKey.url.substr(window.location.origin.length);
+            fileContent = typeof fileContent === 'number' ? BINDING.conv_string(fileContent) : fileContent // tranfering raw pointer to the memory of the mono string
+            const dllBytes = typeof fileContent === 'string' ? convertBase64StringToBytes(fileContent) : fileContent;
+
+            await putInCacheStorage(cache, dllPath, dllBytes);
         }
     };
 }());

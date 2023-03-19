@@ -5,14 +5,14 @@
 
     public class HandleCriticalUserComponentExceptionsLoggerProvider : ILoggerProvider
     {
-        private readonly IJSUnmarshalledRuntime unmarshalledJsRuntime;
+        private readonly IJSInProcessRuntime _jsRuntime;
 
-        public HandleCriticalUserComponentExceptionsLoggerProvider(IJSUnmarshalledRuntime unmarshalledJsRuntime)
+        public HandleCriticalUserComponentExceptionsLoggerProvider(IJSInProcessRuntime jsRuntime)
         {
-            this.unmarshalledJsRuntime = unmarshalledJsRuntime;
+            _jsRuntime = jsRuntime;
         }
 
-        public ILogger CreateLogger(string categoryName) => new HandleCriticalUserComponentExceptionsLogger(this.unmarshalledJsRuntime);
+        public ILogger CreateLogger(string categoryName) => new HandleCriticalUserComponentExceptionsLogger(_jsRuntime);
 
         public void Dispose()
         {

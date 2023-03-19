@@ -208,9 +208,8 @@
 
             if (compilationResult?.AssemblyBytes?.Length > 0)
             {
-                this.UnmarshalledJsRuntime.InvokeUnmarshalled<byte[], object>(
-                    "App.Repl.updateUserAssemblyInCacheStorage",
-                    compilationResult.AssemblyBytes);
+                // Make sure the DLL is updated before reloading the user page
+                await this.JsRuntime.InvokeVoidAsync("App.CodeExecution.updateUserComponentsDll", compilationResult.AssemblyBytes);
 
                 // TODO: Add error page in iframe
                 this.JsRuntime.InvokeVoid("App.reloadIFrame", "user-page-window", MainUserPagePath);
