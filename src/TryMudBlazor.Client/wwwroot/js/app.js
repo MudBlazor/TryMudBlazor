@@ -62,6 +62,38 @@ window.App.CodeEditor = window.App.CodeEditor || (function () {
 
                 _overrideValue = null;
                 _currentLanguage = language || _currentLanguage;
+                
+                monaco.languages.registerCompletionItemProvider('razor', {
+                    provideCompletionItems: async function (model, position) {
+                        var textUntilPosition = model.getValueInRange({
+                            startLineNumber: 1,
+                            startColumn: 1,
+                            endLineNumber: position.lineNumber,
+                            endColumn: position.column,
+                        });
+                        var word = model.getWordUntilPosition(position);
+                        var range = {
+                            startLineNumber: position.lineNumber,
+                            endLineNumber: position.lineNumber,
+                            startColumn: word.startColumn,
+                            endColumn: word.endColumn,
+                        };
+    
+                        var data = await fetch("../data/mud-components.json").then((response) => response.json());
+                        var response = Object.keys(data).map(key => {
+                            return {
+                                label: [data[key].component, data[key].option].filter(Boolean).join(" - "),
+                                insertText: data[key].snippet.join('\n'),
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range
+                            }
+                        });
+                        return {
+                            suggestions: response,
+                        };
+                    },
+                });
             });
         },
         getValue: function () {
