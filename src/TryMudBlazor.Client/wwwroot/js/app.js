@@ -1,4 +1,4 @@
-﻿window.App = window.App || (function () {
+window.App = window.App || (function () {
     return {
         reloadIFrame: function (id, newSrc) {
             const iFrame = document.getElementById(id);
@@ -71,6 +71,9 @@ window.App.CodeEditor = window.App.CodeEditor || (function () {
                             endLineNumber: position.lineNumber,
                             endColumn: position.column,
                         });
+                        if ((textUntilPosition.match(/{/g) || []).length !== (textUntilPosition.match(/}/g) || []).length) {
+                            return { suggestions: [] };
+                        }
                         var word = model.getWordUntilPosition(position);
                         var range = {
                             startLineNumber: position.lineNumber,
