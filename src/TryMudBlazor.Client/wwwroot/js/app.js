@@ -62,7 +62,15 @@ window.App.CodeEditor = window.App.CodeEditor || (function () {
 
                 _overrideValue = null;
                 _currentLanguage = language || _currentLanguage;
-                
+
+                monaco.languages.html.razorDefaults.setModeConfiguration({
+                    completionItems: true,
+                    diagnostics:  true,
+                    documentFormattingEdits: true,
+                    documentHighlights: true,
+                    documentRangeFormattingEdits: true,
+                });
+
                 monaco.languages.registerCompletionItemProvider('razor', {
                     provideCompletionItems: async function (model, position) {
                         var textUntilPosition = model.getValueInRange({
