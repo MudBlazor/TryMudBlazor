@@ -1,0 +1,11 @@
+﻿@page "/TestPage"
+@using Microsoft.JSInterop;
+@inject IJSRuntime js
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await js.InvokeVoidAsync("Editor.Create");
+        await js.InvokeVoidAsync("Editor.Focus");
+    }
+}

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Try.Core\Try.Core.csproj" />
+    <ProjectReference Include="..\Try.Editor\Try.Editor.csproj" />
     <ProjectReference Include="..\UserComponents\Try.UserComponents.csproj" />
   </ItemGroup>
 

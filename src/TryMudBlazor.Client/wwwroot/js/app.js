@@ -95,6 +95,7 @@ window.App.CodeEditor = window.App.CodeEditor || (function () {
                             return {
                                 label: data[key].prefix,
                                 detail : data[key].description,
+                                documentation : data[key].body.join('\n'),
                                 insertText: data[key].body.join('\n'),
                                 kind: monaco.languages.CompletionItemKind.Snippet,
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
