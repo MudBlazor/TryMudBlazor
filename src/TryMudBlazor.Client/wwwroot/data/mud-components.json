@@ -1,32 +1,36 @@
 [
   {
-    "component": "MudButton",
-    "snippet": [
+    "prefix": "MudButton",
+    "description": "Default component",
+    "body": [
       "<MudButton OnClick=\"${1:OnClick}\">${2:Text}</MudButton>"
     ]
   },
   {
-    "component": "MudTextField",
-    "snippet": [
+    "prefix": "MudTextField",
+    "description": "Default component",
+    "body": [
       "<MudTextField @bind-Value=\"${1:Value}\" Label=\"${2:Label}\" Variant=\"${3|Variant.Text,Variant.Filled,Variant.Outlined|}\"/>"
     ]
   },
   {
-    "component": "MudAlert",
-    "snippet": [
+    "prefix": "MudAlert",
+    "description": "Default component",
+    "body": [
       "<MudAlert Severity=\"${1|Severity.Normal,Severity.Info,Severity.Success,Severity.Warning,Severity.Error|}\">${2:Text}</MudAlert>"
     ]
   },
   {
-    "component": "MudSelect",
-    "snippet": [
+    "prefix": "MudSelect",
+    "description": "Default component",
+    "body": [
       "<MudSelect @bind-Value=\"${1:Value}\" Label=\"${2:Label}\">${3}</MudSelect>"
     ]
   },
   {
-    "component": "MudSelect",
-    "option": "with foreach",
-    "snippet": [
+    "prefix": "MudSelect",
+    "description": "With foreach",
+    "body": [
       "<MudSelect @bind-Value=\"${1:Value}\" Label=\"${2:Label}\">",
       "   @foreach (var item in ${3:List})",
       "   {",
@@ -36,5 +40,3 @@
     ]
   }
 ]
-
-

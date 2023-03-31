@@ -1,4 +1,4 @@
-window.App = window.App || (function () {
+﻿window.App = window.App || (function () {
     return {
         reloadIFrame: function (id, newSrc) {
             const iFrame = document.getElementById(id);
@@ -89,13 +89,47 @@ window.App.CodeEditor = window.App.CodeEditor || (function () {
                             startColumn: word.startColumn,
                             endColumn: word.endColumn,
                         };
-    
+
                         var data = await fetch("../data/mud-components.json").then((response) => response.json());
                         var response = Object.keys(data).map(key => {
                             return {
-                                label: [data[key].component, data[key].option].filter(Boolean).join(" - "),
-                                insertText: data[key].snippet.join('\n'),
-                                kind: monaco.languages.CompletionItemKind.Function,
+                                label: data[key].prefix,
+                                detail : data[key].description,
+                                insertText: data[key].body.join('\n'),
+                                kind: monaco.languages.CompletionItemKind.Snippet,
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range
+                            }
+                        });
+                        return {
+                            suggestions: response,
+                        };
+                    },
+                });
+
+                monaco.languages.registerCompletionItemProvider('csharp', {
+                    provideCompletionItems: async function (model, position) {
+                        var textUntilPosition = model.getValueInRange({
+                            startLineNumber: 1,
+                            startColumn: 1,
+                            endLineNumber: position.lineNumber,
+                            endColumn: position.column,
+                        });
+                        var word = model.getWordUntilPosition(position);
+                        var range = {
+                            startLineNumber: position.lineNumber,
+                            endLineNumber: position.lineNumber,
+                            startColumn: word.startColumn,
+                            endColumn: word.endColumn,
+                        };
+
+                        var data = await fetch("../data/csharp.json").then((response) => response.json());
+                        var response = Object.keys(data).map(key => {
+                            return {
+                                label: data[key].prefix,
+                                detail : data[key].description,
+                                insertText: data[key].body.join('\n'),
+                                kind: monaco.languages.CompletionItemKind.Snippet,
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range
                             }
