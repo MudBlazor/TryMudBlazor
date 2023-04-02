@@ -54,7 +54,8 @@
             else if (this.hasCodeChanged)
             {
                 var language = this.CodeFileType == CodeFileType.CSharp ? "csharp" : "razor";
-                this.JsRuntime.InvokeVoid(Try.Editor.SetValue, this.Code, language);
+                this.JsRuntime.InvokeVoid(Try.Editor.SetValue, this.Code);
+                this.JsRuntime.InvokeVoid(Try.Editor.SetLangugage, language);
             }
 
             base.OnAfterRender(firstRender);

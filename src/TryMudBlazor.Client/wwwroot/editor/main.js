@@ -1,8 +1,9 @@
 require.config({ paths: { 'vs': 'lib/monaco-editor/min/vs' } });
 
 let _editor;
-let _overrideValue;
-let _currentLanguage;
+let _dotNetInstance;
+
+const throttleLastTimeFuncNameMappings = {};
 
 function registerLangugageProvider(language) {
     monaco.languages.registerCompletionItemProvider(language, {
@@ -51,14 +52,57 @@ function registerLangugageProvider(language) {
     });
 }
 
+function onKeyDown(e) {
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+
+        if (_dotNetInstance && _dotNetInstance.invokeMethodAsync) {
+            throttle(() => _dotNetInstance.invokeMethodAsync('TriggerCompileAsync'), 1000, 'compile');
+        }
+    }
+}
+
+function throttle(func, timeFrame, id) {
+    const now = new Date();
+    if (now - throttleLastTimeFuncNameMappings[id] >= timeFrame) {
+        func();
+
+        throttleLastTimeFuncNameMappings[id] = now;
+    }
+}
+
 window.Try = {
-    initialize: function () {
-        Split(['#user-code-editor-container', '#user-page-window-container'])
+    initialize: function (dotNetInstance) {
+        _dotNetInstance = dotNetInstance;
+        throttleLastTimeFuncNameMappings['compile'] = new Date();
+
+        Split(['#user-code-editor-container', '#user-page-window-container'], {
+            gutterSize: 6,
+        })
+        window.addEventListener('keydown', onKeyDown);
     },
     changeDisplayUrl: function (url) {
         if (!url) {return; }
         window.history.pushState(null, null, url);
     },
+    reloadIframe: function (id, newSrc) {
+        const iFrame = document.getElementById(id);
+        if (!iFrame) { return; }
+
+        if (!newSrc) {
+            iFrame.contentWindow.location.reload();
+        } else if (iFrame.src !== `${window.location.origin}${newSrc}`) {
+            iFrame.src = newSrc;
+        } else {
+            // There needs to be some change so the iFrame is actually reloaded
+            iFrame.src = '';
+            setTimeout(() => iFrame.src = newSrc);
+        }
+    },
+    dispose: function () {
+        _dotNetInstance = null;
+        window.removeEventListener('keydown', onKeyDown);
+    }
 }
 window.Try.Editor = {
     create: function (editorId, value, language) {
@@ -68,6 +112,13 @@ window.Try.Editor = {
                 value: value || '',
                 language: language || 'razor',
                 automaticLayout: true,
+                mouseWheelZoom: true,
+                bracketPairColorization: {
+                    enabled: true
+                },
+                minimap: {
+                    enabled: false
+                }
             });
 
             monaco.languages.html.razorDefaults.setModeConfiguration({
@@ -85,6 +136,18 @@ window.Try.Editor = {
     getValue: function () {
         return _editor.getValue();
     },
+    setValue: function (value) {
+        _editor.setValue(value);
+    },
+    focus: function () {
+        return _editor.focus();
+    },
+    setLanguage: function (language) {
+        monaco.editor.setModelLanguage(_editor.getModel(), language);
+    },
+    dispose: function () {
+        _editor = null;
+    }
 }
 
 window.Try.CodeExecution = window.Try.CodeExecution || (function () {
