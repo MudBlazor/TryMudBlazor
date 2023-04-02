@@ -279,5 +279,12 @@
 
             return Task.Delay(10); // Ensure rendering has time to be called
         }
+
+        private async void UpdateTheme()
+        {
+            await LayoutService.ToggleDarkMode();
+            string theme = LayoutService.IsDarkMode ? "vs-dark" : "default";
+            this.JsRuntime.InvokeVoid(Try.Editor.SetTheme, theme);
+        }
     }
 }

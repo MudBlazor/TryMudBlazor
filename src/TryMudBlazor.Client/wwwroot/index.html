@@ -64,9 +64,9 @@
     <script type="text/javascript">
         window.addEventListener('storage', (e) => {
             if (e.key == "userPreferences") {
-                const style = parent.document.getElementsByTagName('style')[5];
-                const existingStyle = document.getElementsByTagName('style')[3];
-                existingStyle.innerHTML = style.innerHTML;
+                const mudblazorTheme = parent.document.getElementsByTagName('style')[4];
+                const iFrameTheme = document.getElementsByTagName('style')[3];
+                iFrameTheme.innerHTML = mudblazorTheme.innerHTML;
             }
         });
     </script>
