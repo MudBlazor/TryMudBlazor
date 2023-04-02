@@ -18,13 +18,15 @@ namespace TryMudBlazor.Client
     using Services.UserPreferences;
     using Try.UserComponents;
     using Microsoft.AspNetCore.Components.WebAssembly.Services;
+    using Microsoft.AspNetCore.Components.Web;
 
     public class Program
     {
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("app");
+            builder.RootComponents.Add<App>("#app");
+            builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddSingleton(serviceProvider => (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>());
             builder.Services.AddSingleton(serviceProvider => (IJSUnmarshalledRuntime)serviceProvider.GetRequiredService<IJSRuntime>());

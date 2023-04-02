@@ -1,4 +1,4 @@
-namespace TryMudBlazor.Client.Components
+﻿namespace TryMudBlazor.Client.Components
 {
     using System;
     using System.Threading.Tasks;

@@ -1,7 +1,10 @@
 ﻿
 .try-layout{
+    height: 100%;
     .try-editor{
         display: flex;
+        height: 100%;
+        flex-direction: row;
         position: relative;
         .code-editor {
             height: 100%;
@@ -40,22 +43,6 @@
             font-size: 1.1rem;
             font-weight: 300;
             letter-spacing: 0.5rem;
-        }
-    }
-
-    .try-save-snippet{
-        position: absolute;
-        top: 55px;
-        left: 70px;
-        z-index: 100;
-
-        .mud-input-control{
-            margin-left: 6px;
-            margin-right: 6px;
-            input {
-                padding: 6px 6px;
-                font-size: 0.9rem;
-            }
         }
     }
 
@@ -151,5 +138,13 @@
         font-family: consolas;
         font-size: 14px;
         text-transform: lowercase;
+    }
+}
+
+.try-save-snippet-input {
+    margin: 0 !important;
+    input {
+        padding: 6px 6px !important;
+        font-size: 0.9rem !important;
     }
 }

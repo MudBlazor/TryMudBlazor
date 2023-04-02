@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
-
+<html class="mud-height-full">
 <head prefix="og: http://ogp.me/ns#">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -25,7 +24,7 @@
     <meta name="twitter:description" content="TryMudBlazor is a fiddle-like platform for writing, compiling, executing and sharing Blazor components entirely in the browser. Perfect for code playground and testing.">
     <meta name="twitter:image" content="https://mudblazor.com/_content/MudBlazor.Docs/images/logo.png">
 
-    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400" rel="stylesheet">
@@ -37,23 +36,22 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-33J60J6E14"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-33J60J6E14');
+        gtag('config', 'G-33J60J6E14');
     </script>
 </head>
 
-<body>
-    <app>
+<body class="mud-height-full">
+    <div id="app" class="mud-height-full">
         <div class="d-flex justify-content-center app-loader">
             <div class="spinner-border" role="status">
                 <span class="sr-only"></span>
             </div>
         </div>
-    </app>
-
+    </div>
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
@@ -61,17 +59,16 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js?v=#{CACHE_TOKEN}#"></script>
-    <script src="js/app.js?v=#{CACHE_TOKEN}#"></script>
-      <script type="text/javascript">
-
-    window.addEventListener('storage', (e) => {
-        if (e.key == "userPreferences") {
-            const style = parent.document.getElementsByTagName('style')[5];
-            const existingStyle = document.getElementsByTagName('style')[3];
-            existingStyle.innerHTML = style.innerHTML;
-        }
-    });
-
+    <!--<script src="js/app.js?v=#{CACHE_TOKEN}#"></script>-->
+    <script src="editor/main.js?v=#{CACHE_TOKEN}#"></script>
+    <script type="text/javascript">
+        window.addEventListener('storage', (e) => {
+            if (e.key == "userPreferences") {
+                const style = parent.document.getElementsByTagName('style')[5];
+                const existingStyle = document.getElementsByTagName('style')[3];
+                existingStyle.innerHTML = style.innerHTML;
+            }
+        });
     </script>
 </body>
 
