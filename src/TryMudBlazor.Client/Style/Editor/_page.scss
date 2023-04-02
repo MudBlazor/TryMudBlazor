@@ -119,7 +119,14 @@
     }
     .gutter.gutter-horizontal {
         cursor: ew-resize;
-        background-color: #ccc;
+        background-color: #eee;
+        background-repeat: no-repeat;
+        background-position: 50%;
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+
+        &:active{
+            background-color: #766ae7;
+        }
     }
     .minimap {
         display: none;
