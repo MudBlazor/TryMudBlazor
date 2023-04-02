@@ -1,21 +1,23 @@
-﻿namespace TryMudBlazor.Client.Components
+namespace TryMudBlazor.Client.Components
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using TryMudBlazor.Client.Services;
+    using TryMudBlazor.Client.Models;
     using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
     using MudBlazor;
 
-    public partial class SaveSnippetPopup : IDisposable
+    public partial class SaveSnippetPopup
     {
-        private DotNetObjectReference<SaveSnippetPopup> dotNetInstance;
-
         [Inject]
         public ISnackbar Snackbar { get; set; }
+
+        [Inject]
+        protected IJsApiService JsApiService { get; set; }
 
         [Inject]
         public IJSInProcessRuntime JsRuntime { get; set; }
@@ -44,45 +46,12 @@
         private bool Loading { get; set; }
 
         private string SnippetLink { get; set; }
-
         private bool SnippetLinkCopied { get; set; }
 
-        private string VisibleClass => this.Visible ? "show" : string.Empty;
-
-        private string CopyButtonIcon => this.SnippetLinkCopied ? "icon-check" : "icon-copy";
-
-        private string DisplayStyle => this.Visible ? string.Empty : "display: none;";
-
-        public void Dispose()
+        private async Task CopyLinkToClipboard()
         {
-            this.dotNetInstance?.Dispose();
-
-            this.JsRuntime.InvokeVoid("App.SaveSnippetPopup.dispose");
-        }
-
-        [JSInvokable]
-        public Task CloseAsync() => this.CloseInternalAsync();
-
-        protected override void OnAfterRender(bool firstRender)
-        {
-            if (firstRender)
-            {
-                this.dotNetInstance = DotNetObjectReference.Create(this);
-
-                this.JsRuntime.InvokeVoid(
-                    "App.SaveSnippetPopup.init",
-                    "save-snippet-popup",
-                    this.InvokerId,
-                    this.dotNetInstance);
-            }
-
-            base.OnAfterRender(firstRender);
-        }
-
-        private void CopyLinkToClipboard()
-        {
-            this.JsRuntime.InvokeVoid("App.copyToClipboard", this.SnippetLink);
-            this.SnippetLinkCopied = true;
+            await JsApiService.CopyToClipboardAsync(SnippetLink);
+            SnippetLinkCopied = true;
         }
 
         private async Task SaveAsync()
@@ -96,10 +65,8 @@
                 var snippetId = await this.SnippetsService.SaveSnippetAsync(this.CodeFiles);
 
                 var urlBuilder = new UriBuilder(this.NavigationManager.BaseUri) { Path = $"snippet/{snippetId}" };
-                var url = urlBuilder.Uri.ToString();
-                this.SnippetLink = url;
-
-                this.JsRuntime.InvokeVoid("App.changeDisplayUrl", url);
+                this.SnippetLink = urlBuilder.Uri.ToString();
+                this.JsRuntime.InvokeVoid(Try.ChangeDisplayUrl, SnippetLink);
             }
             catch (InvalidOperationException ex)
             {
@@ -113,14 +80,6 @@
             {
                 this.Loading = false;
             }
-        }
-
-        private Task CloseInternalAsync()
-        {
-            this.Visible = false;
-            this.SnippetLink = null;
-            this.SnippetLinkCopied = false;
-            return this.VisibleChanged.InvokeAsync(this.Visible);
         }
     }
 }
