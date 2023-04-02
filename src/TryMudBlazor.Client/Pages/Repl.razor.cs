@@ -1,4 +1,4 @@
-﻿namespace TryMudBlazor.Client.Pages
+namespace TryMudBlazor.Client.Pages
 {
     using System;
     using System.Collections.Generic;
@@ -209,7 +209,7 @@
             if (compilationResult?.AssemblyBytes?.Length > 0)
             {
                 // Make sure the DLL is updated before reloading the user page
-                await this.JsRuntime.InvokeVoidAsync("App.CodeExecution.updateUserComponentsDll", compilationResult.AssemblyBytes);
+                await this.JsRuntime.InvokeVoidAsync(Try.CodeExecution.UpdateUserComponentsDLL, compilationResult.AssemblyBytes);
 
                 // TODO: Add error page in iframe
                 this.JsRuntime.InvokeVoid("App.reloadIFrame", "user-page-window", MainUserPagePath);

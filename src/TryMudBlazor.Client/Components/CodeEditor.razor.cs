@@ -1,8 +1,9 @@
-﻿namespace TryMudBlazor.Client.Components
+namespace TryMudBlazor.Client.Components
 {
     using System;
     using System.Threading.Tasks;
     using Try.Core;
+    using TryMudBlazor.Client.Models;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
     using System.Text.RegularExpressions;
@@ -32,11 +33,11 @@
             return base.SetParametersAsync(parameters);
         }
 
-        public void Dispose() => this.JsRuntime.InvokeVoid("App.CodeEditor.dispose");
+        public void Dispose() => this.JsRuntime.InvokeVoid(Try.Editor.Dispose);
 
-        internal void Focus() => this.JsRuntime.InvokeVoid("App.CodeEditor.focus");
+        internal void Focus() => this.JsRuntime.InvokeVoid(Try.Editor.Focus);
 
-        internal string GetCode() => this.JsRuntime.Invoke<string>("App.CodeEditor.getValue");
+        internal string GetCode() => this.JsRuntime.Invoke<string>(Try.Editor.GetValue);
 
         protected override void OnAfterRender(bool firstRender)
         {
@@ -48,15 +49,12 @@
 
             if (firstRender)
             {
-                this.JsRuntime.InvokeVoid(
-                   "App.CodeEditor.init",
-                   EditorId,
-                   this.Code ?? CoreConstants.MainComponentDefaultFileContent);
+                this.JsRuntime.InvokeVoid(Try.Editor.Create, EditorId, this.Code ?? CoreConstants.MainComponentDefaultFileContent);
             }
             else if (this.hasCodeChanged)
             {
                 var language = this.CodeFileType == CodeFileType.CSharp ? "csharp" : "razor";
-                this.JsRuntime.InvokeVoid("App.CodeEditor.setValue", this.Code, language);
+                this.JsRuntime.InvokeVoid(Try.Editor.SetValue, this.Code, language);
             }
 
             base.OnAfterRender(firstRender);

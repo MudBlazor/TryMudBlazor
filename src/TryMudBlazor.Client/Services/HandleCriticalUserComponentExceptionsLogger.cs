@@ -4,6 +4,7 @@
     using Try.Core;
     using Microsoft.Extensions.Logging;
     using Microsoft.JSInterop;
+    using TryMudBlazor.Client.Models;
 
     // This is a workaround for the currently missing global exception handling mechanism in Blazor. If the user code generates
     // an assembly that makes the app throw an exception, we need to override the stored assembly in browser's cache storage
@@ -27,9 +28,7 @@
         {
             if (exception?.ToString()?.Contains(CompilationService.DefaultRootNamespace) ?? false)
             {
-                _jsRuntime.InvokeVoid(
-                    "App.CodeExecution.updateUserComponentsDll",
-                    CoreConstants.DefaultUserComponentsAssemblyBytes);
+                _jsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDLL, CoreConstants.DefaultUserComponentsAssemblyBytes);
             }
         }
 
