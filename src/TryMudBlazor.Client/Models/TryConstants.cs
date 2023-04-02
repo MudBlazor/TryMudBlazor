@@ -13,6 +13,7 @@
             public static string SetValue = "Try.Editor.setValue";
             public static string SetLangugage = "Try.Editor.setLanguage";
             public static string Focus = "Try.Editor.focus";
+            public static string SetTheme = "Try.Editor.setTheme";
             public static string Dispose = "Try.Editor.dispose";
         }
 

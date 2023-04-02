@@ -107,10 +107,19 @@ window.Try = {
 window.Try.Editor = {
     create: function (editorId, value, language) {
         if (!editorId) { return; }
+        let _theme;
+
+        if(JSON.parse(localStorage.getItem("userPreferences")).DarkTheme){
+            _theme = "vs-dark";
+        }else{
+            _theme = "default";
+        }
+
         require(['vs/editor/editor.main'], () => {
             _editor = monaco.editor.create(document.getElementById(editorId), {
                 value: value || '',
                 language: language || 'razor',
+                theme: _theme,
                 automaticLayout: true,
                 mouseWheelZoom: true,
                 bracketPairColorization: {
@@ -144,6 +153,9 @@ window.Try.Editor = {
     },
     setLanguage: function (language) {
         monaco.editor.setModelLanguage(_editor.getModel(), language);
+    },
+    setTheme: function (theme) {
+        monaco.editor.setTheme(theme);
     },
     dispose: function () {
         _editor = null;
