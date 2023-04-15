@@ -1,6 +1,5 @@
 require.config({ paths: { 'vs': 'lib/monaco-editor/min/vs' } });
 
-let _editor;
 let _dotNetInstance;
 
 const throttleLastTimeFuncNameMappings = {};
@@ -104,63 +103,77 @@ window.Try = {
         window.removeEventListener('keydown', onKeyDown);
     }
 }
-window.Try.Editor = {
-    create: function (editorId, value, language) {
-        if (!editorId) { return; }
-        let _theme;
 
-        if(JSON.parse(localStorage.getItem("userPreferences")).DarkTheme){
-            _theme = "vs-dark";
-        }else{
-            _theme = "default";
+window.Try.Editor = window.Try.Editor || (function () {
+    let _editor;
+    let _overrideValue;
+
+    return {
+        create: function (id, value, language) {
+            if (!id) { return; }
+            let _theme;
+
+            if(JSON.parse(localStorage.getItem("userPreferences")).DarkTheme){
+                _theme = "vs-dark";
+            }else{
+                _theme = "default";
+            }
+
+            require(['vs/editor/editor.main'], () => {
+                _editor = monaco.editor.create(document.getElementById(id), {
+                    value: _overrideValue || value || '',
+                    language: language || 'razor',
+                    theme: _theme,
+                    automaticLayout: true,
+                    mouseWheelZoom: true,
+                    bracketPairColorization: {
+                        enabled: true
+                    },
+                    minimap: {
+                        enabled: false
+                    }
+                });
+
+                _overrideValue = null;
+
+                monaco.languages.html.razorDefaults.setModeConfiguration({
+                    completionItems: true,
+                    diagnostics:  true,
+                    documentFormattingEdits: true,
+                    documentHighlights: true,
+                    documentRangeFormattingEdits: true,
+                });
+
+                registerLangugageProvider('razor');
+                registerLangugageProvider('csharp');
+            })
+        },
+        getValue: function () {
+            return _editor.getValue();
+        },
+        setValue: function (value) {
+            if(_editor) {
+                _editor.setValue(value);
+            } else {
+                _overrideValue = value;
+            }
+        },
+        focus: function () {
+            return _editor.focus();
+        },
+        setLanguage: function (language) {
+            if(_editor) {
+                monaco.editor.setModelLanguage(_editor.getModel(), language);
+            }
+        },
+        setTheme: function (theme) {
+            monaco.editor.setTheme(theme);
+        },
+        dispose: function () {
+            _editor = null;
         }
-
-        require(['vs/editor/editor.main'], () => {
-            _editor = monaco.editor.create(document.getElementById(editorId), {
-                value: value || '',
-                language: language || 'razor',
-                theme: _theme,
-                automaticLayout: true,
-                mouseWheelZoom: true,
-                bracketPairColorization: {
-                    enabled: true
-                },
-                minimap: {
-                    enabled: false
-                }
-            });
-
-            monaco.languages.html.razorDefaults.setModeConfiguration({
-                completionItems: true,
-                diagnostics:  true,
-                documentFormattingEdits: true,
-                documentHighlights: true,
-                documentRangeFormattingEdits: true,
-            });
-
-            registerLangugageProvider('razor');
-            registerLangugageProvider('csharp');
-        })
-    },
-    getValue: function () {
-        return _editor.getValue();
-    },
-    setValue: function (value) {
-        _editor.setValue(value);
-    },
-    focus: function () {
-        return _editor.focus();
-    },
-    setLanguage: function (language) {
-        monaco.editor.setModelLanguage(_editor.getModel(), language);
-    },
-    setTheme: function (theme) {
-        monaco.editor.setTheme(theme);
-    },
-    dispose: function () {
-        _editor = null;
     }
-}
+}());
 
 window.Try.CodeExecution = window.Try.CodeExecution || (function () {
     const UNEXPECTED_ERROR_MESSAGE = 'An unexpected error has occurred. Please try again later or contact the team.';
