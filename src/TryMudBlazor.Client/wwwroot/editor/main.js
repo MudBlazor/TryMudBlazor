@@ -111,12 +111,13 @@ window.Try.Editor = window.Try.Editor || (function () {
     return {
         create: function (id, value, language) {
             if (!id) { return; }
-            let _theme;
-
-            if(JSON.parse(localStorage.getItem("userPreferences")).DarkTheme){
-                _theme = "vs-dark";
-            }else{
-                _theme = "default";
+            let _theme = "default";
+            let userPreferences = localStorage.getItem("userPreferences");
+            if (userPreferences) {
+                const userPreferencesJSON = JSON.parse(userPreferences);
+                if (userPreferencesJSON.hasOwnProperty("DarkTheme") && userPreferencesJSON.DarkTheme) {
+                    _theme = "vs-dark";
+                }
             }
 
             require(['vs/editor/editor.main'], () => {
