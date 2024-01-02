@@ -133,7 +133,7 @@
             await Task.WhenAll(
                 assemblyNames.Select(async assemblyName =>
                 {
-                    var result = await httpClient.GetAsync($"/_framework/{assemblyName}.wasm");
+                    var result = await httpClient.GetAsync($"/_framework/{assemblyName}.dll");
 
                     result.EnsureSuccessStatusCode();
 
