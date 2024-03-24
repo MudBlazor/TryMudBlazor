@@ -1,26 +1,58 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using MudBlazor.Examples.Data;
+using TryMudBlazor.Client;
+using TryMudBlazor.Client.Shared;
 
-namespace TryMudBlazor.Server
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<IPeriodicTableService, PeriodicTableService>();
+builder.Services.AddCors(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
+    options.AddDefaultPolicy(
+        builder =>
         {
-            CreateHostBuilder(args).Build().Run();
-        }
+            builder.WithOrigins("https://www.mudblazor.com", "https://mudblazor.com");
+        });
+});
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseWebAssemblyDebugging();
 }
+else
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors();
+
+// Needed for wasm project
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
+
+app.MapControllers();
+// Serve the wasm project if no other matches
+app.MapFallbackToFile("index.html");
+
+app.UseStaticFiles();
+app.UseAntiforgery();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+    //.AddAdditionalAssemblies([typeof(MainLayout).Assembly]);
+
+app.Run();

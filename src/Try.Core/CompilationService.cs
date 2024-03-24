@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
@@ -135,6 +136,8 @@
                 {
                     var result = await httpClient.GetAsync($"/_framework/{assemblyName}.dll");
 
+                    Console.WriteLine( result.RequestMessage );
+                    Console.WriteLine( result.StatusCode );
                     result.EnsureSuccessStatusCode();
 
                     streams.TryAdd(assemblyName, await result.Content.ReadAsStreamAsync());

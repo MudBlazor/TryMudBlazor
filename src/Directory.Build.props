@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(TargetFrameworks);net8.0</TargetFrameworks>
-    <!-- <LangVersion>latest</LangVersion> -->
-    <!-- <Deterministic>true</Deterministic> -->
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
 </Project>
