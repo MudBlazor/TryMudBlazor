@@ -44,7 +44,7 @@ namespace Tests
         {
             var snippetService = new SnippetsService(snippetsOptions, new System.Net.Http.HttpClient(), new MockNavigationManager());
             var codeFiles = await snippetService.GetSnippetContentAsync("2021020540572059");
-            Assert.IsNotNull(codeFiles);
+            Assert.That(codeFiles, Is.Not.Null);
         }
 
         [Test]
@@ -53,14 +53,14 @@ namespace Tests
         {
             var snippetService = new SnippetsService(snippetsOptions, new System.Net.Http.HttpClient(), new MockNavigationManager());
             var id = await snippetService.SaveSnippetAsync(codeFiles);
-            Assert.IsNotNull(id);
+            Assert.That(id, Is.Not.Null);
             Console.WriteLine(id);
             var savedCodeFiles = await snippetService.GetSnippetContentAsync(id);
             List<CodeFile> savedCodeFilesList = new List<CodeFile>(savedCodeFiles);
             for (int i = 0; i  < codeFiles.Count; i++ )
             {
-                Assert.AreEqual(codeFiles[i].Path, savedCodeFilesList[i].Path);
-                Assert.AreEqual(codeFiles[i].Content,  savedCodeFilesList[i].Content);
+                Assert.That(codeFiles[i].Path, Is.EqualTo(savedCodeFilesList[i].Path));
+                Assert.That(codeFiles[i].Content,  Is.EqualTo(savedCodeFilesList[i].Content));
             }
         }
 
@@ -72,10 +72,10 @@ namespace Tests
             Console.WriteLine(encoded);
             var decoded = DecodeSnippetId(encoded);
             Console.WriteLine(decoded);
-            Assert.AreEqual(snippetId, decoded);
+            Assert.That(snippetId, Is.EqualTo(decoded));
             var encoded2 = EncodeSnippetId(snippetId);
             Console.WriteLine(encoded2);
-            Assert.AreNotEqual(encoded, encoded2);
+            Assert.That(encoded, Is.Not.EqualTo(encoded2));
         }
     }
 }
