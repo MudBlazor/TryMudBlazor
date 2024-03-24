@@ -18,7 +18,6 @@ namespace TryMudBlazor.Client
     using Services.UserPreferences;
     using Try.UserComponents;
     using Microsoft.AspNetCore.Components.WebAssembly.Services;
-    using Microsoft.AspNetCore.Components.Web;
 
     public static class Program
     {
@@ -30,7 +29,7 @@ namespace TryMudBlazor.Client
             builder.Services.AddSingleton(serviceProvider => (IJSUnmarshalledRuntime)serviceProvider.GetRequiredService<IJSRuntime>());
             builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddScoped<SnippetsService>();
-            builder.Services.AddSingleton(new CompilationService());
+            builder.Services.AddSingleton<CompilationService>();
 
             builder.Services
                 .AddOptions<SnippetsOptions>()

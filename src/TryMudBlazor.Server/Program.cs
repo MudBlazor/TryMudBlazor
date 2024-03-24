@@ -40,6 +40,7 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<TryMudBlazor.Server.App>()
     .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(Try.UserComponents.__Main).Assembly)
     .AddAdditionalAssemblies(typeof(TryMudBlazor.Client._Imports).Assembly);
 
 app.Run();
