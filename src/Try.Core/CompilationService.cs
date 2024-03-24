@@ -136,8 +136,6 @@
                 {
                     var result = await httpClient.GetAsync($"/_framework/{assemblyName}.dll");
 
-                    Console.WriteLine( result.RequestMessage );
-                    Console.WriteLine( result.StatusCode );
                     result.EnsureSuccessStatusCode();
 
                     streams.TryAdd(assemblyName, await result.Content.ReadAsStreamAsync());
