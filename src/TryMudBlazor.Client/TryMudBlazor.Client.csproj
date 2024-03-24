@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <PublishTrimmed>false</PublishTrimmed>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
   </PropertyGroup>
 
   <ItemGroup>

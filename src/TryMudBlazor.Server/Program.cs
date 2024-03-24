@@ -36,10 +36,10 @@ app.UseRouting();
 app.UseCors();
 app.UseStaticFiles();
 app.MapControllers();
-app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<TryMudBlazor.Server.App>()
-    .AddInteractiveWebAssemblyRenderMode();
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(TryMudBlazor.Client._Imports).Assembly);
 
 app.Run();
