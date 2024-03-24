@@ -1,6 +1,5 @@
 <Router AppAssembly="@typeof(Program).Assembly"
-        AdditionalAssemblies="@(new List<System.Reflection.Assembly> { typeof(Try.UserComponents.__Main).Assembly })"
-        @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)">
+        AdditionalAssemblies="@([typeof(Try.UserComponents.__Main).Assembly])">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(EmptyLayout)" />
     </Found>
@@ -10,4 +9,3 @@
         </LayoutView>
     </NotFound>
 </Router>
-@* <HeadOutlet @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)"/> *@

@@ -1,12 +1,8 @@
-using Microsoft.AspNetCore.Builder;
 using MudBlazor.Examples.Data;
-using TryMudBlazor.Client;
-using TryMudBlazor.Client.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
-    //.AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddScoped<IPeriodicTableService, PeriodicTableService>();
@@ -36,25 +32,14 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.UseCors();
-
-// Needed for wasm project
-app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-
 app.MapControllers();
-// Serve the wasm project if no other matches
-app.MapFallbackToFile("index.html");
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
-    //.AddInteractiveServerRenderMode()
+app.MapRazorComponents<TryMudBlazor.Server.App>()
     .AddInteractiveWebAssemblyRenderMode();
-    //.AddAdditionalAssemblies(typeof(MainLayout).Assembly);
 
 app.Run();

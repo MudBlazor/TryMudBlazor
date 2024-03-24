@@ -42,6 +42,8 @@
 
         gtag('config', 'G-33J60J6E14');
     </script>
+
+    <HeadOutlet @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />
 </head>
 
 <body class="mud-height-full">
@@ -57,7 +59,8 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <Routes @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />
+    <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js?v=#{CACHE_TOKEN}#"></script>
     <script src="editor/main.js?v=#{CACHE_TOKEN}#"></script>
     <script type="text/javascript">
