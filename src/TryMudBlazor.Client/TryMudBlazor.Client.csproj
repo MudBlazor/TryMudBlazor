@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <PublishTrimmed>false</PublishTrimmed>
-    <UserSecretsId>4bb79e6f-9796-46cb-a3d0-31b21ac94f9a</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
