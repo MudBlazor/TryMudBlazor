@@ -1,12 +1,11 @@
 ﻿@page "/"
 
-
 <MudLayout Class="try-mudblazor-index">
     <MudAppBar Color="Color.Transparent" Fixed="false" Elevation="0">
         <div class="brand">Try<span>MudBlazor</span></div>
         <MudSpacer />
-        <MudButton Link="https://mudblazor.com/" Color="Color.Default" Size="Size.Large">MudBlazor</MudButton>
-        <MudButton Link="https://github.com/MudBlazor/TryMudBlazor" Color="Color.Primary" Size="Size.Large">Source Code</MudButton>
+        <MudButton Href="https://mudblazor.com/" Color="Color.Default" Size="Size.Large">MudBlazor</MudButton>
+        <MudButton Href="https://github.com/MudBlazor/TryMudBlazor" Color="Color.Primary" Size="Size.Large">Source Code</MudButton>
     </MudAppBar>
     <MudMainContent>
         <MudContainer Class="my-16" MaxWidth="MaxWidth.Large">
@@ -151,8 +150,6 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
-
-
 
 @code { 
     string Version { get { var v = typeof(MudText).Assembly.GetName().Version; return $"v{v.Major}.{v.Minor}.{v.Build}"; } } 

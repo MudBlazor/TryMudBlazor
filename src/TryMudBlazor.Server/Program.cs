@@ -1,12 +1,13 @@
+using Microsoft.AspNetCore.Builder;
 using MudBlazor.Examples.Data;
 using TryMudBlazor.Client;
 using TryMudBlazor.Client.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    //.AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddScoped<IPeriodicTableService, PeriodicTableService>();
 builder.Services.AddCors(options =>
@@ -52,7 +53,8 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-    //.AddAdditionalAssemblies([typeof(MainLayout).Assembly]);
+    //.AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode();
+    //.AddAdditionalAssemblies(typeof(MainLayout).Assembly);
 
 app.Run();
