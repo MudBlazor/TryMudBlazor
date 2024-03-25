@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(TargetFrameworks);net8.0</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <PublishTrimmed>false</PublishTrimmed>
     <WasmEnableWebcil>false</WasmEnableWebcil>
   </PropertyGroup>
 
