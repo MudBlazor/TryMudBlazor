@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\UserComponents\Try.UserComponents.csproj" />
   </ItemGroup>
 
