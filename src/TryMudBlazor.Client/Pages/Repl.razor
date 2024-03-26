@@ -41,7 +41,9 @@
             }
         </div>
         <MudSpacer />
-        <MudText Typo="Typo.body2" Class="ml-10 try-mudblazor-version">MudBlazor @Version</MudText>
+        <MudLink Typo="Typo.body2" Class="ml-10 version-info" Color="Color.Inherit" Href="https://github.com/MudBlazor/TryMudBlazor/commits/main" Target="_blank">@ThisAssembly.GitCommitId.Substring(0, 7)</MudLink>
+        <MudText Typo="Typo.body2" Class="ml-5 version-info">.NET @Environment.Version.ToString()</MudText>
+        <MudText Typo="Typo.body2" Class="ml-5 version-info">MudBlazor @Version</MudText>
     </MudAppBar>
 </div>
 @code{
