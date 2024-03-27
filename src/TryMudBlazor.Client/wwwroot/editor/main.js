@@ -107,11 +107,11 @@ window.Try = {
 window.Try.Editor = window.Try.Editor || (function () {
     let _editor;
     let _overrideValue;
+    let _theme = "vs-dark";
 
     return {
         create: function (id, value, language) {
             if (!id) { return; }
-            let _theme = "default";
             let userPreferences = localStorage.getItem("userPreferences");
             if (userPreferences) {
                 const userPreferencesJSON = JSON.parse(userPreferences);
