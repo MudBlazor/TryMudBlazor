@@ -111,7 +111,7 @@ window.Try.Editor = window.Try.Editor || (function () {
     return {
         create: function (id, value, language) {
             if (!id) { return; }
-            let _theme = "default";
+            let _theme = "vs-dark";
             let userPreferences = localStorage.getItem("userPreferences");
             if (userPreferences) {
                 const userPreferencesJSON = JSON.parse(userPreferences);
