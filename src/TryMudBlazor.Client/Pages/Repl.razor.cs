@@ -5,19 +5,19 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using TryMudBlazor.Client.Components;
-    using TryMudBlazor.Client.Services;
-    using TryMudBlazor.Client.Models;
-    using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.CodeAnalysis;
     using Microsoft.JSInterop;
     using MudBlazor;
+    using Try.Core;
+    using TryMudBlazor.Client.Components;
+    using TryMudBlazor.Client.Models;
+    using TryMudBlazor.Client.Services;
 
     public partial class Repl : IDisposable
     {
         [Inject] private LayoutService LayoutService { get; set; }
-        
+
         private const string MainComponentCodePrefix = "@page \"/__main\"\n";
         private const string MainUserPagePath = "/__main";
 

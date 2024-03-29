@@ -1,12 +1,12 @@
 ﻿namespace TryMudBlazor.Client.Components
 {
     using System;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using Try.Core;
-    using TryMudBlazor.Client.Models;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
-    using System.Text.RegularExpressions;
+    using Try.Core;
+    using TryMudBlazor.Client.Models;
 
     public partial class CodeEditor : IDisposable
     {

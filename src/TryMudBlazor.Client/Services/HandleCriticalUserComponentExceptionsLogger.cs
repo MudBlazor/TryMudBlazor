@@ -1,9 +1,9 @@
 ﻿namespace TryMudBlazor.Client.Services
 {
     using System;
-    using Try.Core;
     using Microsoft.Extensions.Logging;
     using Microsoft.JSInterop;
+    using Try.Core;
     using TryMudBlazor.Client.Models;
 
     // This is a workaround for the currently missing global exception handling mechanism in Blazor. If the user code generates

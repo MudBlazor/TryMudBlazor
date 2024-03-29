@@ -5,9 +5,9 @@
     using System.IO;
     using System.IO.Compression;
     using System.Text;
-    using Try.Core;
     using Microsoft.AspNetCore.WebUtilities;
     using Microsoft.CodeAnalysis.CSharp;
+    using Try.Core;
 
     public static class CodeFilesHelper
     {

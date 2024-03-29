@@ -1,13 +1,13 @@
 namespace Tests
 {
-    using NUnit.Framework;
-    using TryMudBlazor.Client.Services;
-    using TryMudBlazor.Client.Models;
-    using Try.Core;
-    using Microsoft.Extensions.Options;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
     using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Options;
+    using NUnit.Framework;
+    using Try.Core;
+    using TryMudBlazor.Client.Models;
+    using TryMudBlazor.Client.Services;
     using static TryMudBlazor.Server.Utilities.SnippetsEncoder;
 
     /// <summary>
@@ -33,7 +33,7 @@ namespace Tests
             var codeFile2 = new CodeFile() { Path = "Test.razor" };
             codeFile2.Content = "<h1>Test</h1>";
             codeFiles.Add(codeFile2);
-            snippetsOptions = Options.Create(new SnippetsOptions(){SnippetsService = "api/snippets"});
+            snippetsOptions = Options.Create(new SnippetsOptions() { SnippetsService = "api/snippets" });
 
         }
 
@@ -57,10 +57,10 @@ namespace Tests
             Console.WriteLine(id);
             var savedCodeFiles = await snippetService.GetSnippetContentAsync(id);
             List<CodeFile> savedCodeFilesList = new List<CodeFile>(savedCodeFiles);
-            for (int i = 0; i  < codeFiles.Count; i++ )
+            for (int i = 0; i < codeFiles.Count; i++)
             {
                 Assert.That(codeFiles[i].Path, Is.EqualTo(savedCodeFilesList[i].Path));
-                Assert.That(codeFiles[i].Content,  Is.EqualTo(savedCodeFilesList[i].Content));
+                Assert.That(codeFiles[i].Content, Is.EqualTo(savedCodeFilesList[i].Content));
             }
         }
 

@@ -6,19 +6,19 @@ namespace TryMudBlazor.Client
     using System.Reflection;
     using System.Threading.Tasks;
     using Blazored.LocalStorage;
-    using TryMudBlazor.Client.Models;
-    using TryMudBlazor.Client.Services;
-    using Try.Core;
+    using Microsoft.AspNetCore.Components.Web;
     using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+    using Microsoft.AspNetCore.Components.WebAssembly.Services;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.JSInterop;
     using MudBlazor.Services;
     using Services.UserPreferences;
+    using Try.Core;
     using Try.UserComponents;
-    using Microsoft.AspNetCore.Components.WebAssembly.Services;
-    using Microsoft.AspNetCore.Components.Web;
+    using TryMudBlazor.Client.Models;
+    using TryMudBlazor.Client.Services;
 
     public class Program
     {
@@ -97,7 +97,7 @@ namespace TryMudBlazor.Client
             {
                 throw new MissingMemberException($"Couldn't find property '{instanceFieldName}' in '{defaultJsRuntimeTypeName}'.");
             }
-            
+
             return (IJSInProcessRuntime)instanceField.GetValue(obj: null);
         }
     }

@@ -7,10 +7,10 @@
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
-    using TryMudBlazor.Client.Models;
-    using Try.Core;
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.Options;
+    using Try.Core;
+    using TryMudBlazor.Client.Models;
 
     public class SnippetsService
     {
