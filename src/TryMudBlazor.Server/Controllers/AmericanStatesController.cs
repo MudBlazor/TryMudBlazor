@@ -2,23 +2,22 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using MudBlazor.Examples.Data;
 
-namespace TryMudBlazor.Server.Controllers
-{
-    [Route("wasm/webapi/[controller]")]
-    [Route("webapi/[controller]")]
-    [ApiController]
-    public class AmericanStatesController : ControllerBase
-    {
-        [HttpGet("{search}")]
-        public IEnumerable<string> Get(string search)
-        {
-            return AmericanStates.GetStates(search);
-        }
+namespace TryMudBlazor.Server.Controllers;
 
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return AmericanStates.GetStates();
-        }
+[Route("wasm/webapi/[controller]")]
+[Route("webapi/[controller]")]
+[ApiController]
+public class AmericanStatesController : ControllerBase
+{
+    [HttpGet("{search}")]
+    public IEnumerable<string> Get(string search)
+    {
+        return AmericanStates.GetStates(search);
+    }
+
+    [HttpGet]
+    public IEnumerable<string> Get()
+    {
+        return AmericanStates.GetStates();
     }
 }
