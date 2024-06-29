@@ -14,7 +14,7 @@ namespace TryMudBlazor.Server.Controllers;
 [ApiController]
 public class SnippetsController : ControllerBase
 {
-    private readonly BlobContainerClient containerClient;
+    private readonly BlobContainerClient _containerClient;
 
     public SnippetsController(IConfiguration config)
     {
@@ -34,7 +34,7 @@ public class SnippetsController : ControllerBase
             {
                 ManagedIdentityClientId = config["ManagedCredentialsId"]
             };
-            containerClient = new BlobContainerClient(containerUri,
+            _containerClient = new BlobContainerClient(containerUri,
                 new DefaultAzureCredential(defaultAzureCredentialOptions));
         }
         else
@@ -42,7 +42,7 @@ public class SnippetsController : ControllerBase
             var blobUri = new BlobUriBuilder(containerUri);
             var accountName = blobUri.AccountName;
             var key = new StorageSharedKeyCredential(accountName, accessKey);
-            containerClient = new BlobContainerClient(containerUri, key);
+            _containerClient = new BlobContainerClient(containerUri, key);
         }
     }
 
@@ -50,7 +50,7 @@ public class SnippetsController : ControllerBase
     public async Task<IActionResult> Get(string snippetId)
     {
         snippetId = DecodeSnippetId(snippetId);
-        var blob = containerClient.GetBlobClient(BlobPath(snippetId));
+        var blob = _containerClient.GetBlobClient(BlobPath(snippetId));
         var response = await blob.DownloadAsync();
         var zipStream = new MemoryStream();
         await response.Value.Content.CopyToAsync(zipStream);
@@ -63,7 +63,7 @@ public class SnippetsController : ControllerBase
     public async Task<IActionResult> Post()
     {
         var newSnippetId = NewSnippetId();
-        await containerClient.UploadBlobAsync(BlobPath(newSnippetId), Request.Body);
+        await _containerClient.UploadBlobAsync(BlobPath(newSnippetId), Request.Body);
 
         return Ok(EncodeSnippetId(newSnippetId));
     }
