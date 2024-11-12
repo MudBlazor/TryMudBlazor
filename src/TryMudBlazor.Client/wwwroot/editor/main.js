@@ -213,7 +213,7 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
             const cache = await caches.open('dotnet-resources-/');
 
             const cacheKeys = await cache.keys();
-            const userComponentsDllCacheKey = cacheKeys.find(x => x.url.indexOf('Try.UserComponents.dll') > -1);
+            const userComponentsDllCacheKey = cacheKeys.find(x => /Try\.UserComponents\.[^/]*\.dll/.test(x.url));
             if (!userComponentsDllCacheKey || !userComponentsDllCacheKey.url) {
                 alert(UNEXPECTED_ERROR_MESSAGE);
                 return;

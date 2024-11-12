@@ -29,7 +29,6 @@ namespace TryMudBlazor.Client
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddSingleton(serviceProvider => (IJSInProcessRuntime)serviceProvider.GetRequiredService<IJSRuntime>());
-            builder.Services.AddSingleton(serviceProvider => (IJSUnmarshalledRuntime)serviceProvider.GetRequiredService<IJSRuntime>());
             builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddScoped<SnippetsService>();
             builder.Services.AddSingleton(new CompilationService());
@@ -92,7 +91,7 @@ namespace TryMudBlazor.Client
                 throw new MissingMemberException($"Couldn't find type '{defaultJsRuntimeTypeName}'.");
             }
 
-            var instanceField = defaultJsRuntimeType.GetField(instanceFieldName, BindingFlags.Static | BindingFlags.NonPublic);
+            var instanceField = defaultJsRuntimeType.GetField(instanceFieldName, BindingFlags.Static | BindingFlags.Public);
             if (instanceField == null)
             {
                 throw new MissingMemberException($"Couldn't find property '{instanceFieldName}' in '{defaultJsRuntimeTypeName}'.");

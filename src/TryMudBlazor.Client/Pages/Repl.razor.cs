@@ -37,9 +37,6 @@
         [Inject]
         public IJSInProcessRuntime JsRuntime { get; set; }
 
-        [Inject]
-        public IJSUnmarshalledRuntime UnmarshalledJsRuntime { get; set; }
-
         [Parameter]
         public string SnippetId { get; set; }
 
