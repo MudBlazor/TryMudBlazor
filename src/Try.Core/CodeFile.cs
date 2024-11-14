@@ -19,11 +19,11 @@
         {
             get
             {
-                if (!this.type.HasValue)
+                if (!type.HasValue)
                 {
-                    var extension = System.IO.Path.GetExtension(this.Path);
+                    var extension = System.IO.Path.GetExtension(Path);
 
-                    this.type = extension switch
+                    type = extension switch
                     {
                         RazorFileExtension => CodeFileType.Razor,
                         CsharpFileExtension => CodeFileType.CSharp,
@@ -31,7 +31,7 @@
                     };
                 }
 
-                return this.type.Value;
+                return type.Value;
             }
         }
     }

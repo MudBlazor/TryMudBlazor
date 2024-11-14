@@ -5,7 +5,7 @@ namespace Try.Core
 
     internal class VirtualProjectItem : RazorProjectItem
     {
-        private readonly byte[] content;
+        private readonly byte[] _content;
 
         public VirtualProjectItem(
             string basePath,
@@ -15,14 +15,14 @@ namespace Try.Core
             string fileKind,
             byte[] content)
         {
-            this.BasePath = basePath;
-            this.FilePath = filePath;
-            this.PhysicalPath = physicalPath;
-            this.RelativePhysicalPath = relativePhysicalPath;
-            this.content = content;
+            BasePath = basePath;
+            FilePath = filePath;
+            PhysicalPath = physicalPath;
+            RelativePhysicalPath = relativePhysicalPath;
+            _content = content;
 
             // Base class will detect based on file-extension.
-            this.FileKind = fileKind ?? base.FileKind;
+            FileKind = fileKind ?? base.FileKind;
         }
 
         public override string BasePath { get; }
@@ -37,6 +37,6 @@ namespace Try.Core
 
         public override bool Exists => true;
 
-        public override Stream Read() => new MemoryStream(this.content);
+        public override Stream Read() => new MemoryStream(this._content);
     }
 }

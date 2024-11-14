@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.ComponentModel.DataAnnotations;
     using System.IO;
     using System.Linq;
@@ -18,7 +19,6 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Razor;
     using Microsoft.JSInterop;
-    using Try;
 
     public class CompilationService
     {
@@ -44,17 +44,18 @@
 
         // Creating the initial compilation + reading references is on the order of 250ms without caching
         // so making sure it doesn't happen for each run.
-        private static CSharpCompilation baseCompilation;
-        private static CSharpParseOptions cSharpParseOptions;
+        private static CSharpCompilation _baseCompilation;
+        private static CSharpParseOptions _cSharpParseOptions;
 
         private readonly RazorProjectFileSystem fileSystem = new VirtualRazorProjectFileSystem();
-        private readonly RazorConfiguration configuration = RazorConfiguration.Create(
+        private readonly RazorConfiguration configuration = new(
             RazorLanguageVersion.Latest,
-            configurationName: "Blazor",
-            extensions: Array.Empty<RazorExtension>());
+            ConfigurationName: "Blazor",
+            Extensions: ImmutableArray<RazorExtension>.Empty);
 
         public static async Task InitAsync(HttpClient httpClient)
         {
+           
             var basicReferenceAssemblyRoots = new[]
             {
                 typeof(Console).Assembly, // System.Console
@@ -89,7 +90,7 @@
                 .Select(a => a.Value)
                 .ToList();
 
-            baseCompilation = CSharpCompilation.Create(
+            _baseCompilation = CSharpCompilation.Create(
                 DefaultRootNamespace,
                 Array.Empty<SyntaxTree>(),
                 basicReferenceAssemblies,
@@ -104,7 +105,7 @@
                         new KeyValuePair<string, ReportDiagnostic>("CS1702", ReportDiagnostic.Suppress),
                     }));
 
-            cSharpParseOptions = new CSharpParseOptions(LanguageVersion.Preview);
+            _cSharpParseOptions = new CSharpParseOptions(LanguageVersion.Preview);
         }
 
         public async Task<CompileToAssemblyResult> CompileToAssemblyAsync(
@@ -154,10 +155,10 @@
             for (var i = 0; i < cSharpResults.Count; i++)
             {
                 var cSharpResult = cSharpResults[i];
-                syntaxTrees[i] = CSharpSyntaxTree.ParseText(cSharpResult.Code, cSharpParseOptions, cSharpResult.FilePath);
+                syntaxTrees[i] = CSharpSyntaxTree.ParseText(cSharpResult.Code, _cSharpParseOptions, cSharpResult.FilePath);
             }
 
-            var finalCompilation = baseCompilation.AddSyntaxTrees(syntaxTrees);
+            var finalCompilation = _baseCompilation.AddSyntaxTrees(syntaxTrees);
 
             var compilationDiagnostics = finalCompilation.GetDiagnostics().Where(d => d.Severity > DiagnosticSeverity.Info);
 
@@ -181,7 +182,7 @@
             return result;
         }
 
-        private static RazorProjectItem CreateRazorProjectItem(string fileName, string fileContent)
+        private static VirtualProjectItem CreateRazorProjectItem(string fileName, string fileContent)
         {
             var fullPath = WorkingDirectory + fileName;
 
@@ -249,12 +250,12 @@
             var tempAssembly = CompileToAssembly(declarations);
             if (tempAssembly.Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
             {
-                return new[] { new CompileToCSharpResult { Diagnostics = tempAssembly.Diagnostics } };
+                return [new CompileToCSharpResult { Diagnostics = tempAssembly.Diagnostics }];
             }
 
             // Add the 'temp' compilation as a metadata reference
-            var references = new List<MetadataReference>(baseCompilation.References) { tempAssembly.Compilation.ToMetadataReference() };
-            projectEngine = this.CreateRazorProjectEngine(references);
+            var references = new List<MetadataReference>(_baseCompilation.References) { tempAssembly.Compilation.ToMetadataReference() };
+            projectEngine = CreateRazorProjectEngine(references);
 
             await (updateStatusFunc?.Invoke("Preparing Project") ?? Task.CompletedTask);
 
@@ -287,7 +288,7 @@
         }
 
         private RazorProjectEngine CreateRazorProjectEngine(IReadOnlyList<MetadataReference> references) =>
-            RazorProjectEngine.Create(this.configuration, this.fileSystem, b =>
+            RazorProjectEngine.Create(configuration, fileSystem, b =>
             {
                 b.SetRootNamespace(DefaultRootNamespace);
                 b.AddDefaultImports(DefaultImports);

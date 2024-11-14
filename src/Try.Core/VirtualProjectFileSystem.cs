@@ -1,6 +1,5 @@
 namespace Try.Core
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.AspNetCore.Razor.Language;
@@ -9,15 +8,15 @@ namespace Try.Core
     {
         public override IEnumerable<RazorProjectItem> EnumerateItems(string basePath)
         {
-            this.NormalizeAndEnsureValidPath(basePath);
+            NormalizeAndEnsureValidPath(basePath);
             return Enumerable.Empty<RazorProjectItem>();
         }
 
-        public override RazorProjectItem GetItem(string path) => this.GetItem(path, fileKind: null);
+        public override RazorProjectItem GetItem(string path) => GetItem(path, fileKind: null);
 
         public override RazorProjectItem GetItem(string path, string fileKind)
         {
-            this.NormalizeAndEnsureValidPath(path);
+            NormalizeAndEnsureValidPath(path);
             return new NotFoundProjectItem(string.Empty, path);
         }
     }

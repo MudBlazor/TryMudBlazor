@@ -8,8 +8,8 @@
     {
         public NotFoundProjectItem(string basePath, string path)
         {
-            this.BasePath = basePath;
-            this.FilePath = path;
+            BasePath = basePath;
+            FilePath = path;
         }
 
         public override string BasePath { get; }

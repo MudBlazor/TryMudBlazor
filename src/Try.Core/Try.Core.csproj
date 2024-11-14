@@ -1,12 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <AssemblyName>Microsoft.CodeAnalysis.Razor.Test</AssemblyName>
+    <KeyOriginatorFile>$(PkgMicrosoft_DotNet_Arcade_Sdk)\tools\snk\AspNetCore.snk</KeyOriginatorFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="System.Net.Http.Json" Version="9.0.0" />
     <PackageReference Include="MudBlazor" Version="*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0-2.24555.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.13.0-2.24555.1" />
+    <PackageReference Include="Microsoft.DotNet.Arcade.Sdk" Version="9.0.0-beta.24372.7" PrivateAssets="all" IncludeAssets="none" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.Net.Compilers.Razor.Toolset" Version="9.0.0-preview.24555.4" PrivateAssets="all" IncludeAssets="none" GeneratePathProperty="true" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="$(PkgMicrosoft_Net_Compilers_Razor_Toolset)\source-generators\Microsoft.CodeAnalysis.Razor.Compiler.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,25 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UserComponents\Try.UserComponents.csproj" />
-  </ItemGroup>
-
-  <!-- https://github.com/dotnet/razor/issues/9494#issuecomment-2438228960 -->
-  <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions">
-      <HintPath>..\..\libs\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Razor.Language">
-      <HintPath>..\..\libs\Microsoft.AspNetCore.Razor.Language.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Razor.Utilities.Shared">
-      <HintPath>..\..\libs\Microsoft.AspNetCore.Razor.Utilities.Shared.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.Razor">
-      <HintPath>..\..\libs\Microsoft.CodeAnalysis.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.ObjectPool">
-      <HintPath>..\..\libs\Microsoft.Extensions.ObjectPool.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

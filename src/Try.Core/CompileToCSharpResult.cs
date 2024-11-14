@@ -1,7 +1,6 @@
 ﻿namespace Try.Core
 {
     using System.Collections.Generic;
-    using System.Linq;
     using Microsoft.AspNetCore.Razor.Language;
 
     internal class CompileToCSharpResult
@@ -12,6 +11,6 @@
 
         public string FilePath { get; set; }
 
-        public IEnumerable<CompilationDiagnostic> Diagnostics { get; set; } = Enumerable.Empty<CompilationDiagnostic>();
+        public IEnumerable<CompilationDiagnostic> Diagnostics { get; set; } = [];
     }
 }
