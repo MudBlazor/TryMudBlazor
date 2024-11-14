@@ -55,7 +55,7 @@
 
         public static async Task InitAsync(HttpClient httpClient)
         {
-           
+
             var basicReferenceAssemblyRoots = new[]
             {
                 typeof(Console).Assembly, // System.Console
