@@ -1,11 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Azure.Identity;
+﻿using Azure.Identity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using static TryMudBlazor.Server.Utilities.SnippetsEncoder;
 
 namespace TryMudBlazor.Server.Controllers;
