@@ -55,7 +55,6 @@
 
         public static async Task InitAsync(Func<IReadOnlyCollection<string>, ValueTask<IReadOnlyList<byte[]>>> getReferencedDllsBytesFunc)
         {
-
             var basicReferenceAssemblyRoots = new[]
             {
                 typeof(Console).Assembly, // System.Console
@@ -76,7 +75,7 @@
                 [
                     assembly.GetName()
                 ]))
-                .Select(an => an.Name)
+                .Select(assemblyName => assemblyName.Name)
                 .ToHashSet());
 
             var basicReferenceAssemblies = assemblyNames
