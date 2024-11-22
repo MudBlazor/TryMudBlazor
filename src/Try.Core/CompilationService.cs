@@ -53,7 +53,7 @@
             ConfigurationName: "Blazor",
             Extensions: ImmutableArray<RazorExtension>.Empty);
 
-        public static async Task InitAsync(HttpClient httpClient)
+        public static async Task InitAsync(Func<ICollection<string>, ValueTask<IReadOnlyList<byte[]>>> getReferencedDllsBytesFunc)
         {
 
             var basicReferenceAssemblyRoots = new[]
@@ -71,24 +71,17 @@
                 typeof(WebAssemblyHostBuilder).Assembly, // Microsoft.AspNetCore.Components.WebAssembly
                 typeof(FluentValidation.AbstractValidator<>).Assembly,
             };
+            var assemblyNames = await getReferencedDllsBytesFunc(basicReferenceAssemblyRoots
+                .SelectMany(assembly => assembly.GetReferencedAssemblies().Concat(
+                [
+                    assembly.GetName()
+                ]))
+                .Select(an => an.Name)
+                .ToHashSet());
 
-            var assemblyNames = basicReferenceAssemblyRoots
-                .SelectMany(assembly => assembly.GetReferencedAssemblies().Concat(new[] { assembly.GetName() }))
-                .Select(x => x.Name)
-                .Distinct()
-                .ToList();
-
-            var assemblyStreams = await GetStreamFromHttpAsync(httpClient, assemblyNames);
-
-            var allReferenceAssemblies = assemblyStreams.ToDictionary(a => a.Key, a => MetadataReference.CreateFromStream(a.Value));
-
-            var basicReferenceAssemblies = allReferenceAssemblies
-                .Where(a => basicReferenceAssemblyRoots
-                    .Select(x => x.GetName().Name)
-                    .Union(basicReferenceAssemblyRoots.SelectMany(y => y.GetReferencedAssemblies().Select(z => z.Name)))
-                    .Any(n => n == a.Key))
-                .Select(a => a.Value)
-                .ToList();
+             var basicReferenceAssemblies = assemblyNames
+                 .Select(peImage => MetadataReference.CreateFromImage(peImage, MetadataReferenceProperties.Assembly))
+                 .ToList();
 
             _baseCompilation = CSharpCompilation.Create(
                 DefaultRootNamespace,
@@ -123,25 +116,6 @@
             var result = CompileToAssembly(cSharpResults);
 
             return result;
-        }
-
-        private static async Task<IDictionary<string, Stream>> GetStreamFromHttpAsync(
-            HttpClient httpClient,
-            IEnumerable<string> assemblyNames)
-        {
-            var streams = new ConcurrentDictionary<string, Stream>();
-
-            await Task.WhenAll(
-                assemblyNames.Select(async assemblyName =>
-                {
-                    var result = await httpClient.GetAsync($"/_framework/{assemblyName}.dll");
-
-                    result.EnsureSuccessStatusCode();
-
-                    streams.TryAdd(assemblyName, await result.Content.ReadAsStreamAsync());
-                }));
-
-            return streams;
         }
 
         private static CompileToAssemblyResult CompileToAssembly(IReadOnlyList<CompileToCSharpResult> cSharpResults)

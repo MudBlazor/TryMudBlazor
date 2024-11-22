@@ -1,32 +1,28 @@
 ﻿namespace TryMudBlazor.Client.Shared
 {
     using System;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
+    using Microsoft.JSInterop;
     using MudBlazor;
     using Services;
     using Try.Core;
-    using TryMudBlazor.Client;
+    using static TryMudBlazor.Client.Models.Try;
 
     public partial class MainLayout : LayoutComponentBase, IDisposable
     {
-        [Inject] public HttpClient HttpClient { get; set; }
-        [Inject] private LayoutService LayoutService { get; set; }
-
         private MudThemeProvider _mudThemeProvider;
+
+        [Inject]
+        private LayoutService LayoutService { get; set; }
+
+        [Inject]
+        private IJSRuntime JsRuntime { get; set; }
 
         protected override void OnInitialized()
         {
             LayoutService.MajorUpdateOccured += LayoutServiceOnMajorUpdateOccured;
             base.OnInitialized();
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            await CompilationService.InitAsync(this.HttpClient);
-
-            await base.OnInitializedAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -36,8 +32,14 @@
             if (firstRender)
             {
                 await ApplyUserPreferences();
+                await CompilationService.InitAsync(GetReferenceAssembliesStreamsAsync);
                 StateHasChanged();
             }
+        }
+
+        private ValueTask<IReadOnlyList<byte[]>> GetReferenceAssembliesStreamsAsync(IEnumerable<string> referenceAssemblyNames)
+        {
+            return JsRuntime.InvokeAsync<IReadOnlyList<byte[]>>(CodeExecution.GetCompilationDlls, new List<string>(referenceAssemblyNames) { "netstandard" });
         }
 
         private async Task ApplyUserPreferences()

@@ -28,7 +28,7 @@
         {
             if (exception?.ToString()?.Contains(CompilationService.DefaultRootNamespace) ?? false)
             {
-                _jsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDLL, CoreConstants.DefaultUserComponentsAssemblyBytes);
+                _jsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDll, CoreConstants.DefaultUserComponentsAssemblyBytes);
             }
         }
 

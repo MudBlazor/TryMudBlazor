@@ -205,6 +205,22 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
     }
 
     return {
+        getCompilationDlls: async function (dllNames) {
+            const cache = await caches.open('dotnet-resources-/');
+            const keys = await cache.keys();
+            const dllsData = [];
+            await Promise.all(dllNames.map(async (dll) => {
+                // Requires WasmFingerprintAssets to be enabled
+                const pattern = new RegExp(`${dll}.[^\\.]*\\.dll`, 'i');
+                const dllKey = keys.find(x => pattern.test(x.url)).url.substring(window.location.origin.length);
+                const response = await cache.match(dllKey);
+                const bytes = new Uint8Array(await response.arrayBuffer());
+                dllsData.push(bytes);
+            }));
+
+            return dllsData;
+        },
+
         updateUserComponentsDll: async function (fileContent) {
             if (!fileContent) {
                 return;
@@ -213,13 +229,14 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
             const cache = await caches.open('dotnet-resources-/');
 
             const cacheKeys = await cache.keys();
-            const userComponentsDllCacheKey = cacheKeys.find(x => /Try\.UserComponents\.dll/.test(x.url));
+            // Requires WasmFingerprintAssets to be enabled
+            const userComponentsDllCacheKey = cacheKeys.find(x => /Try\.UserComponents\.[^/]*\.dll/.test(x.url));
             if (!userComponentsDllCacheKey || !userComponentsDllCacheKey.url) {
                 alert(UNEXPECTED_ERROR_MESSAGE);
                 return;
             }
 
-            const dllPath = userComponentsDllCacheKey.url.substr(window.location.origin.length);
+            const dllPath = userComponentsDllCacheKey.url.substring(window.location.origin.length);
             fileContent = typeof fileContent === 'number' ? BINDING.conv_string(fileContent) : fileContent // tranfering raw pointer to the memory of the mono string
             const dllBytes = typeof fileContent === 'string' ? convertBase64StringToBytes(fileContent) : fileContent;
 

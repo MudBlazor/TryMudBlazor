@@ -3,7 +3,6 @@
   <PropertyGroup>
     <PublishTrimmed>false</PublishTrimmed>
     <WasmEnableWebcil>false</WasmEnableWebcil>
-    <WasmFingerprintAssets>false</WasmFingerprintAssets>
   </PropertyGroup>
 
   <ItemGroup>
