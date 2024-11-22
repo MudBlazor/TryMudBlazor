@@ -79,9 +79,9 @@
                 .Select(an => an.Name)
                 .ToHashSet());
 
-             var basicReferenceAssemblies = assemblyNames
-                 .Select(peImage => MetadataReference.CreateFromImage(peImage, MetadataReferenceProperties.Assembly))
-                 .ToList();
+            var basicReferenceAssemblies = assemblyNames
+                .Select(peImage => MetadataReference.CreateFromImage(peImage, MetadataReferenceProperties.Assembly))
+                .ToList();
 
             _baseCompilation = CSharpCompilation.Create(
                 DefaultRootNamespace,
