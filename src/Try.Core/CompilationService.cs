@@ -1,7 +1,6 @@
 ﻿namespace Try.Core
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.ComponentModel.DataAnnotations;
@@ -25,16 +24,18 @@
         public const string DefaultRootNamespace = $"{nameof(Try)}.{nameof(UserComponents)}";
 
         private const string WorkingDirectory = "/TryMudBlazor/";
-        private const string DefaultImports = @"@using System.ComponentModel.DataAnnotations
-@using System.Linq
-@using System.Net.Http
-@using System.Net.Http.Json
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.Components.Web
-@using Microsoft.JSInterop
-@using MudBlazor
-";
+        private static readonly string[] DefaultImports =
+        [
+            "@using System.ComponentModel.DataAnnotations",
+            "@using System.Linq",
+            "@using System.Net.Http",
+            "@using System.Net.Http.Json",
+            "@using Microsoft.AspNetCore.Components.Forms",
+            "@using Microsoft.AspNetCore.Components.Routing",
+            "@using Microsoft.AspNetCore.Components.Web",
+            "@using Microsoft.JSInterop",
+            "@using MudBlazor"
+        ];
 
         private const string MudBlazorServices = @"
 <MudDialogProvider FullWidth=""true"" MaxWidth=""MaxWidth.ExtraSmall"" />
@@ -104,10 +105,7 @@
             ICollection<CodeFile> codeFiles,
             Func<string, Task> updateStatusFunc) // TODO: try convert to event
         {
-            if (codeFiles == null)
-            {
-                throw new ArgumentNullException(nameof(codeFiles));
-            }
+            ArgumentNullException.ThrowIfNull(codeFiles);
 
             var cSharpResults = await this.CompileToCSharpAsync(codeFiles, updateStatusFunc);
 
@@ -261,16 +259,16 @@
         }
 
         private RazorProjectEngine CreateRazorProjectEngine(IReadOnlyList<MetadataReference> references) =>
-            RazorProjectEngine.Create(configuration, fileSystem, b =>
+            RazorProjectEngine.Create(configuration, fileSystem, builder =>
             {
-                b.SetRootNamespace(DefaultRootNamespace);
-                b.AddDefaultImports(DefaultImports);
+                builder.SetRootNamespace(DefaultRootNamespace);
+                builder.AddDefaultImports(DefaultImports);
 
                 // Features that use Roslyn are mandatory for components
-                CompilerFeatures.Register(b);
+                CompilerFeatures.Register(builder);
 
-                b.Features.Add(new CompilationTagHelperFeature());
-                b.Features.Add(new DefaultMetadataReferenceFeature { References = references });
+                builder.Features.Add(new CompilationTagHelperFeature());
+                builder.Features.Add(new DefaultMetadataReferenceFeature { References = references });
             });
     }
 }
