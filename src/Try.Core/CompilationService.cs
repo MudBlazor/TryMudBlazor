@@ -53,7 +53,7 @@
             ConfigurationName: "Blazor",
             Extensions: ImmutableArray<RazorExtension>.Empty);
 
-        public static async Task InitAsync(Func<ICollection<string>, ValueTask<IReadOnlyList<byte[]>>> getReferencedDllsBytesFunc)
+        public static async Task InitAsync(Func<IReadOnlyCollection<string>, ValueTask<IReadOnlyList<byte[]>>> getReferencedDllsBytesFunc)
         {
 
             var basicReferenceAssemblyRoots = new[]

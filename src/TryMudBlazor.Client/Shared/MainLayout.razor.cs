@@ -37,7 +37,7 @@
             }
         }
 
-        private ValueTask<IReadOnlyList<byte[]>> GetReferenceAssembliesStreamsAsync(IEnumerable<string> referenceAssemblyNames)
+        private ValueTask<IReadOnlyList<byte[]>> GetReferenceAssembliesStreamsAsync(IReadOnlyCollection<string> referenceAssemblyNames)
         {
             return JsRuntime.InvokeAsync<IReadOnlyList<byte[]>>(CodeExecution.GetCompilationDlls, new List<string>(referenceAssemblyNames) { "netstandard" });
         }
