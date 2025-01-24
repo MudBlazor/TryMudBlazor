@@ -37,6 +37,9 @@
         [Inject]
         public IJSInProcessRuntime JsRuntime { get; set; }
 
+        [Inject]
+        public NavigationManager NavigationManager { get; set; }
+
         [Parameter]
         public string SnippetId { get; set; }
 
@@ -285,6 +288,12 @@
             // LayoutService calls StateHasChanged, we need the updated <style> tags for updateIframeTheme to work
             await Task.Yield();
             await JsRuntime.InvokeVoidAsync("updateIframeTheme");
+        }
+
+        private async Task ClearCache()
+        {
+            await JsRuntime.InvokeVoidAsync("Try.clearCache");
+            NavigationManager.NavigateTo(NavigationManager.BaseUri, true);
         }
     }
 }
