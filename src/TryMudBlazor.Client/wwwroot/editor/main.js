@@ -3,6 +3,7 @@ require.config({ paths: { 'vs': 'lib/monaco-editor/min/vs' } });
 let _dotNetInstance;
 
 const throttleLastTimeFuncNameMappings = {};
+const CACHE_NAME = 'dotnet-resources-/';
 
 function registerLangugageProvider(language) {
     monaco.languages.registerCompletionItemProvider(language, {
@@ -96,6 +97,20 @@ window.Try = {
             // There needs to be some change so the iFrame is actually reloaded
             iFrame.src = '';
             setTimeout(() => iFrame.src = newSrc);
+        }
+    },
+    clearCache: async function () {
+        const cacheName = CACHE_NAME;
+        try {
+            const cache = await caches.open(cacheName);
+            const keys = await cache.keys();
+
+            await Promise.all(keys.map(key => {
+                return cache.delete(key);
+            }));
+            console.log(`Cache '${cacheName}' has been cleared.`);
+        } catch (error) {
+            console.error('Error clearing cache:', error);
         }
     },
     dispose: function () {
@@ -206,7 +221,7 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
 
     return {
         getCompilationDlls: async function (dllNames) {
-            const cache = await caches.open('dotnet-resources-/');
+            const cache = await caches.open(CACHE_NAME);
             const keys = await cache.keys();
             const dllsData = [];
             await Promise.all(dllNames.map(async (dll) => {
@@ -226,7 +241,7 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
                 return;
             }
 
-            const cache = await caches.open('dotnet-resources-/');
+            const cache = await caches.open(CACHE_NAME);
 
             const cacheKeys = await cache.keys();
             // Requires WasmFingerprintAssets to be enabled

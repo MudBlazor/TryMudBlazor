@@ -1,8 +1,9 @@
 ﻿@page "/user-page"
 
 <MudContainer Class="mt-8">    
-    <MudText>This snippet hasn't been compiled yet.</MudText>
-    <MudText>Run the code on the left to see the result here.</MudText>
+    <MudAlert Style="width: max-content;padding-right: 30px;" Severity="Severity.Warning">
+    <MudText>This snippet hasn't been compiled yet.<br/>Run the code on the left to see the result here.</MudText>    
+    </MudAlert>    
     <MudText Typo="@Typo.h6" Class="mt-12">How to load your own service</MudText>
     <MudText Class="mt-3">
         To install a service which your snippet can use create a new *.cs file, <br/>

@@ -1,3 +1,4 @@
+using MudBlazor;
 using MudBlazor.Examples.Data;
 
 namespace TryMudBlazor.Server;
@@ -41,7 +42,10 @@ public class Program
         app.UseStaticFiles();
 
         app.MapControllers();
-        app.MapFallbackToFile("index.html");
+
+        var v = typeof(MudText).Assembly.GetName().Version;
+        var cacheBusting = $"v{v.Major}.{v.Minor}.{v.Build}";
+        app.MapFallbackToFile("index.html").CacheOutput(policy => policy.SetVaryByQuery("cachebust", cacheBusting));
 
         app.Run();
     }
