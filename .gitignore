@@ -355,3 +355,4 @@ Client/Properties/ServiceDependencies/TryMudBlazor - Web Deploy/
 # Rider idea folder
 .idea/
 *.DS_Store
+/src/TryMudBlazor.Server/wwwroot/client

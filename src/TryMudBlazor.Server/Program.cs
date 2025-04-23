@@ -44,7 +44,7 @@ public class Program
 
         var version = GetVersion();
         var cacheBusting = $"v{version.Major}.{version.Minor}.{version.Build}";
-        app.MapFallbackToFile("index.html")
+        app.MapFallbackToFile("client/index.html")
             .CacheOutput(policy => policy.SetVaryByQuery("cachebust", cacheBusting));
 
         app.Run();
