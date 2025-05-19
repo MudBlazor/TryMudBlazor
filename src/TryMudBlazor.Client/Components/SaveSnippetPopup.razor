@@ -1,7 +1,7 @@
 ﻿<div class="relative">
     <MudPopover Open="@Visible" AnchorOrigin="Origin.TopRight" Class="ml-4 px-4 pt-3 pb-2">
         <MudStack>
-            <MudText Typo="Typo.h6">Save Public Snippet</MudText>
+            <MudText Typo="Typo.h6">Save public snippet</MudText>
             <div>
                 <MudText Typo="Typo.body2">Please do <b>NOT</b> include any personal data.</MudText>
                 <MudText Typo="Typo.body2">Please do <b>NOT</b> include any copyrighted content.</MudText>
@@ -15,7 +15,7 @@
                 else
                 {
                     <div>
-                        <MudButton Color="Color.Primary" Disabled="@Loading" @onclick="SaveAsync" Class="ml-n1">Confirm</MudButton>
+                        <MudButton Color="Color.Primary" Disabled="@Loading" @onclick="SaveAsync" Class="ml-n1">Share</MudButton>
                     </div>
                 }
             }
