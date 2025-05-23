@@ -25,10 +25,12 @@
     }
 
     .try-drawer {
+        padding-top: 32px;
         background-color: var(--try-drawer);
         color: var(--try-drawer-text);
         width: var(--mud-drawer-width-mini-left) !important;
         overflow: hidden;
+        position:relative;
 
         & + .mud-icon-button {
             padding: 12px;
@@ -54,6 +56,12 @@
             font-size: 1.1rem;
             font-weight: 300;
             letter-spacing: 0.5rem;
+            user-select: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0; /* Behind everything else */
         }
     }
 
