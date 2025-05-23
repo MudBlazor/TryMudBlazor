@@ -25,12 +25,17 @@
     }
 
     .try-drawer {
-        padding-top: 32px;
+        padding-top: 16px;
+        padding-bottom: 40px;
         background-color: var(--try-drawer);
         color: var(--try-drawer-text);
         width: var(--mud-drawer-width-mini-left) !important;
         overflow: hidden;
         position:relative;
+        
+        .mud-drawer-content {
+            gap: 16px;
+        }
 
         & + .mud-icon-button {
             padding: 12px;
