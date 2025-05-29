@@ -18,25 +18,43 @@
 <div class="try-layout">
     <MudDrawer Open="true" Fixed="false" Elevation="1" Breakpoint="Breakpoint.None" Variant="@DrawerVariant.Persistent" Class="try-drawer mud-drawer-mini">
         <div class="top-buttons">
-            <MudTooltip Text="Run (Ctrl + S)" Placement="Placement.Right">
-                <MudIconButton OnClick="@CompileAsync" Disabled="@Loading" Icon="@Icons.Material.Filled.PlayArrow" Color="Color.Success" />
+            <MudTooltip Text="Run (Ctrl + S)"
+                        Placement="Placement.Right">
+                <MudIconButton OnClick="@CompileAsync"
+                               Disabled="@Loading"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.PlayArrow : Icons.Material.Outlined.PlayArrow)"
+                               Color="@(LayoutService.IsDarkMode ? Color.Success : Color.Inherit)" />
             </MudTooltip>
 
-            <MudTooltip Text="Save" Placement="Placement.Right">
-                <SaveSnippetPopup @bind-Visible="SaveSnippetPopupVisible" CodeFiles="@CodeFiles.Values" UpdateActiveCodeFileContentAction="UpdateActiveCodeFileContent" />
-                <MudIconButton OnClick="ShowSaveSnippetPopup" Icon="@Icons.Material.Filled.Save" Color="Color.Info" />
+            <MudTooltip Text="Save"
+                        Placement="Placement.Right">
+                <SaveSnippetPopup @bind-Visible="SaveSnippetPopupVisible"
+                                  CodeFiles="@CodeFiles.Values"
+                                  UpdateActiveCodeFileContentAction="UpdateActiveCodeFileContent" />
+                <MudIconButton OnClick="ShowSaveSnippetPopup"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.Save : Icons.Material.Outlined.Save)"
+                               Class="save-button"
+                               Color="@(LayoutService.IsDarkMode ? Color.Info : Color.Inherit)" />
             </MudTooltip>
 
-            <MudTooltip Text="@(LayoutService.IsDarkMode ? "Light mode" : "Dark mode")" Placement="Placement.Right">
-                <MudIconButton OnClick="@UpdateTheme" Icon="@(LayoutService.IsDarkMode? @Icons.Material.Filled.LightMode : @Icons.Material.Filled.DarkMode)" />
+            <MudTooltip Text="@(LayoutService.IsDarkMode ? "Light mode" : "Dark mode")"
+                        Placement="Placement.Right">
+                <MudIconButton OnClick="@UpdateTheme"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Outlined.DarkMode)"
+                               Class="dark-button"
+                               Color="@(LayoutService.IsDarkMode ? Color.Warning : Color.Inherit)" />
             </MudTooltip>
         </div>
 
         <span class="brand">Try MudBlazor</span>
 
         <div class="bottom-buttons">
-            <MudTooltip Text="Clear cache" Placement="Placement.Right">
-                <MudIconButton OnClick="@ClearCache" Icon="@Icons.Material.Filled.Cached" />
+            <MudTooltip Text="Clear cache"
+                        Placement="Placement.Right">
+                <MudIconButton OnClick="@ClearCache"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.Cached : Icons.Material.Outlined.Cached)"
+                               Class="cache-button"
+                               Color="@(LayoutService.IsDarkMode ? Color.Default : Color.Inherit)" />
             </MudTooltip>
         </div>
     </MudDrawer>
