@@ -23,7 +23,7 @@
             <MudTooltip Text="Run (Ctrl + S)" Placement="Placement.Bottom">
                 <MudIconButton OnClick="@CompileAsync"
                                Disabled="@Loading"
-                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.PlayArrow : Icons.Material.Outlined.PlayArrow)"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Outlined.PlayArrow : Icons.Material.Filled.PlayArrow)"
                                Color="@(LayoutService.IsDarkMode ? Color.Success : Color.Inherit)" />
             </MudTooltip>
 
@@ -32,14 +32,14 @@
                                   CodeFiles="@CodeFiles.Values"
                                   UpdateActiveCodeFileContentAction="UpdateActiveCodeFileContent" />
                 <MudIconButton OnClick="ShowSaveSnippetPopup"
-                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.Save : Icons.Material.Outlined.Save)"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Outlined.Save : Icons.Material.Filled.Save)"
                                Class="save-button"
                                Color="@(LayoutService.IsDarkMode ? Color.Info : Color.Inherit)" />
             </MudTooltip>
 
             <MudTooltip Text="@(LayoutService.IsDarkMode ? "Light mode" : "Dark mode")" Placement="Placement.Right">
                 <MudIconButton OnClick="@UpdateTheme"
-                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Outlined.DarkMode)"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Outlined.LightMode : Icons.Material.Filled.DarkMode)"
                                Class="dark-button"
                                Color="@(LayoutService.IsDarkMode ? Color.Warning : Color.Inherit)" />
             </MudTooltip>
@@ -50,7 +50,7 @@
         <div class="bottom-buttons">
             <MudTooltip Text="Clear cache" Placement="Placement.Right">
                 <MudIconButton OnClick="@ClearCache"
-                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Filled.Cached : Icons.Material.Outlined.Cached)"
+                               Icon="@(LayoutService.IsDarkMode ? Icons.Material.Outlined.Cached : Icons.Material.Filled.Cached)"
                                Class="cache-button"
                                Color="@(LayoutService.IsDarkMode ? Color.Default : Color.Inherit)" />
             </MudTooltip>
