@@ -29,10 +29,19 @@
         background-color: var(--try-drawer);
         color: var(--try-drawer-text);
         width: var(--mud-drawer-width-mini-left) !important;
-        overflow: hidden;
         
         .mud-drawer-content {
             gap: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+
+            .top-buttons, .bottom-buttons{
+                gap: 8px;
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         & + .mud-icon-button {
@@ -47,10 +56,6 @@
         .mud-icon-button {
             padding: 16px;
             border-radius: 0px;
-
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.05);
-            }
         }
 
         .brand {
@@ -60,11 +65,6 @@
             font-weight: 300;
             letter-spacing: 0.5rem;
             user-select: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0; /* Behind everything else */
             text-wrap-mode: nowrap;
         }
     }
