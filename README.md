@@ -1,4 +1,10 @@
-# ![MudBlazor](content/MudBlazor-GitHub-NoBg.png)
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="content/MudBlazor-GitHub-NoBg-Dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="content/MudBlazor-GitHub-NoBg.png">
+    <img alt="MudBlazor" src="content/MudBlazor-GitHub-NoBg.png">
+  </picture>
+</h1>
 # TryMudBlazor
 [![GitHub](https://img.shields.io/github/license/mudblazor/trymudblazor?color=594ae2&logo=github&style=flat-square)](https://github.com/MudBlazor/TryMudBlazor/blob/main/LICENSE)
 [![Discord](https://img.shields.io/discord/786656789310865418?color=%237289da&label=Discord&logo=discord&logoColor=%237289da&style=flat-square)](https://discord.gg/mudblazor)
