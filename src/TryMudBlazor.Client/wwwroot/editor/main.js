@@ -70,6 +70,16 @@ function throttle(func, timeFrame, id) {
     }
 }
 
+// Listen for hot-reload signals when running inside the preview iframe
+if (window.frameElement) {
+    window.addEventListener('message', function (e) {
+        if (e.origin !== window.location.origin) return;
+        if (e.data?.type === 'hotReload' && window._hotReloadRef) {
+            window._hotReloadRef.invokeMethodAsync('HotReload');
+        }
+    });
+}
+
 window.Try = {
     initialize: function (dotNetInstance) {
         _dotNetInstance = dotNetInstance;
@@ -101,7 +111,14 @@ window.Try = {
     dispose: function () {
         _dotNetInstance = null;
         window.removeEventListener('keydown', onKeyDown);
-    }
+    },
+    registerHotReload: function (dotNetRef) {
+        window._hotReloadRef = dotNetRef;
+        window._hotReloadReady = true;
+    },
+    requestFullReload: function (src) {
+        window.parent.Try.reloadIframe('user-page-window', src);
+    },
 }
 
 window.Try.Editor = window.Try.Editor || (function () {
@@ -181,6 +198,19 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
     const USER_COMPONENTS_DLL_STORAGE_KEY = 'TryMudBlazor.UserComponentsDllBase64';
 
     return {
+        hotReloadIframe: function (id, fallbackSrc) {
+            const iFrame = document.getElementById(id);
+            if (!iFrame) return;
+
+            const iframeWindow = iFrame.contentWindow;
+            if (iframeWindow && iframeWindow._hotReloadReady) {
+                // Iframe is live — signal it to hot-reload from sessionStorage
+                iframeWindow.postMessage({ type: 'hotReload' }, window.location.origin);
+            } else {
+                // Iframe not yet ready (first run) — fall back to full navigation
+                Try.reloadIframe(id, fallbackSrc);
+            }
+        },
         updateUserComponentsDll: function (dllData) {
             if (!dllData) return;
 

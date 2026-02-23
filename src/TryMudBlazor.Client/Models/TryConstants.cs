@@ -20,6 +20,7 @@
         public static class CodeExecution
         {
             public const string UpdateUserComponentsDll = "Try.CodeExecution.updateUserComponentsDll";
+            public const string HotReloadIframe = "Try.CodeExecution.hotReloadIframe";
         }
     }
 }

@@ -1,0 +1,71 @@
+@page "/__main"
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@using System.Runtime.Loader
+@using Try.UserComponents
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.ExtraSmall" />
+<MudSnackbarProvider />
+
+<DynamicComponent Type="@_type" />
+
+@code {
+    private Type _type = typeof(__Main);
+    private DotNetObjectReference<UserMainPage> _ref;
+    private AssemblyLoadContext _loadContext;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _ref = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("Try.registerHotReload", _ref);
+        }
+    }
+
+    [JSInvokable]
+    public async Task HotReload()
+    {
+        try
+        {
+            var base64 = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "TryMudBlazor.UserComponentsDllBase64");
+            if (base64 == null) return;
+
+            var bytes = Convert.FromBase64String(base64);
+
+            // Swap to a fresh collectible context; previous one becomes eligible for GC
+            // once Blazor disposes the old component instance below.
+            var previousContext = _loadContext;
+            _loadContext = new AssemblyLoadContext(name: null, isCollectible: true);
+            var assembly = _loadContext.LoadFromStream(new MemoryStream(bytes));
+            previousContext?.Unload();
+
+            // UserStartup requires DI re-registration — fall back to full iframe reload
+            if (assembly.GetType("UserStartup") != null ||
+                assembly.GetType("Try.UserComponents.UserStartup") != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Try.requestFullReload", "/__main");
+                return;
+            }
+
+            var newType = assembly.GetType("Try.UserComponents.__Main");
+            if (newType != null)
+            {
+                _type = newType;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch
+        {
+            await JSRuntime.InvokeVoidAsync("Try.requestFullReload", "/__main");
+        }
+    }
+
+    public void Dispose()
+    {
+        _ref?.Dispose();
+        _loadContext?.Unload();
+    }
+}
