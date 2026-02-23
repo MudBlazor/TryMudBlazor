@@ -204,7 +204,7 @@
             if (compilationResult?.AssemblyBytes?.Length > 0)
             {
                 // Make sure the DLL is updated before reloading the user page
-                await this.JsRuntime.InvokeVoidAsync(Try.CodeExecution.UpdateUserComponentsDll, compilationResult.AssemblyBytes);
+                this.JsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDll, compilationResult.AssemblyBytes);
 
                 // TODO: Add error page in iframe
                 this.JsRuntime.InvokeVoid(Try.ReloadIframe, "user-page-window", MainUserPagePath);
@@ -290,10 +290,9 @@
             await JsRuntime.InvokeVoidAsync("updateIframeTheme");
         }
 
-        private async Task ClearCache()
+        private void ClearCache()
         {
-            await JsRuntime.InvokeVoidAsync("Try.clearCache");
-            NavigationManager.NavigateTo(NavigationManager.BaseUri, true);
+            NavigationManager.NavigateTo(NavigationManager.BaseUri, forceLoad: true);
         }
     }
 }

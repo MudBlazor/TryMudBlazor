@@ -3,7 +3,6 @@ require.config({ paths: { 'vs': 'lib/monaco-editor/min/vs' } });
 let _dotNetInstance;
 
 const throttleLastTimeFuncNameMappings = {};
-const CACHE_NAME = 'dotnet-resources-/';
 
 function registerLangugageProvider(language) {
     monaco.languages.registerCompletionItemProvider(language, {
@@ -99,20 +98,6 @@ window.Try = {
             setTimeout(() => iFrame.src = newSrc);
         }
     },
-    clearCache: async function () {
-        const cacheName = CACHE_NAME;
-        try {
-            const cache = await caches.open(cacheName);
-            const keys = await cache.keys();
-
-            await Promise.all(keys.map(key => {
-                return cache.delete(key);
-            }));
-            console.log(`Cache '${cacheName}' has been cleared.`);
-        } catch (error) {
-            console.error('Error clearing cache:', error);
-        }
-    },
     dispose: function () {
         _dotNetInstance = null;
         window.removeEventListener('keydown', onKeyDown);
@@ -195,48 +180,24 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
     const UNEXPECTED_ERROR_MESSAGE = 'An unexpected error has occurred. Please try again later or contact the team.';
     const USER_COMPONENTS_DLL_STORAGE_KEY = 'TryMudBlazor.UserComponentsDllBase64';
 
-    function putInCacheStorage(cache, fileName, fileBytes, contentType) {
-        const cachedResponse = new Response(
-            new Blob([fileBytes]),
-            {
-                headers: {
-                    'Content-Type': contentType || 'application/octet-stream',
-                    'Content-Length': fileBytes.length.toString()
-                }
-            });
-
-        return cache.put(fileName, cachedResponse);
-    }
-
-    function convertBase64StringToBytes(base64String) {
-        const binaryString = window.atob(base64String);
-
-        const bytesCount = binaryString.length;
-        const bytes = new Uint8Array(bytesCount);
-        for (let i = 0; i < bytesCount; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        return bytes;
-    }
-
-    function convertBytesToBase64String(bytes) {
-        let binaryString = '';
-        for (let i = 0; i < bytes.length; i++) {
-            binaryString += String.fromCharCode(bytes[i]);
-        }
-
-        return window.btoa(binaryString);
-    }
-
     return {
-        updateUserComponentsDll: async function (fileContent) {
-            if (!fileContent) {
-                return;
+        updateUserComponentsDll: function (dllData) {
+            if (!dllData) return;
+
+            // .NET byte[] arrives as a Uint8Array via the runtime's byte-array interop optimization.
+            // A plain string means the caller passed a pre-encoded base64 constant (e.g. DefaultUserComponentsAssemblyBytes).
+            let dllBase64;
+            if (typeof dllData === 'string') {
+                dllBase64 = dllData;
+            } else {
+                // Uint8Array → base64, processed in chunks to avoid call-stack overflow on large arrays.
+                let binary = '';
+                const chunk = 8192;
+                for (let i = 0; i < dllData.length; i += chunk) {
+                    binary += String.fromCharCode(...dllData.subarray(i, i + chunk));
+                }
+                dllBase64 = btoa(binary);
             }
-            fileContent = typeof fileContent === 'number' ? BINDING.conv_string(fileContent) : fileContent // tranfering raw pointer to the memory of the mono string
-            const dllBytes = typeof fileContent === 'string' ? convertBase64StringToBytes(fileContent) : fileContent;
-            const dllBase64 = convertBytesToBase64String(dllBytes);
 
             try {
                 window.sessionStorage.setItem(USER_COMPONENTS_DLL_STORAGE_KEY, dllBase64);

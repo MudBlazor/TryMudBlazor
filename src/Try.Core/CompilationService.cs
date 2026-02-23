@@ -58,6 +58,8 @@
 
         public static unsafe Task InitAsync()
         {
+            if (_baseCompilation != null) return Task.CompletedTask;
+
             var basicReferenceAssemblyRoots = new[]
             {
                 typeof(Console).Assembly, // System.Console
