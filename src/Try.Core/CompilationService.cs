@@ -131,6 +131,32 @@
             return result;
         }
 
+        // Compiles to a Roslyn compilation reference without emitting a PE image.
+        // Used for the declaration (phase 1) pass where we only need component type info.
+        private static (CompileToCSharpResult error, MetadataReference metadataRef) CompileToMetadataReference(
+            IReadOnlyList<CompileToCSharpResult> cSharpResults)
+        {
+            if (cSharpResults.Any(r => r.Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error)))
+            {
+                return (new CompileToCSharpResult { Diagnostics = cSharpResults.SelectMany(r => r.Diagnostics).ToList() }, null);
+            }
+
+            var syntaxTrees = new SyntaxTree[cSharpResults.Count];
+            for (var i = 0; i < cSharpResults.Count; i++)
+            {
+                syntaxTrees[i] = CSharpSyntaxTree.ParseText(cSharpResults[i].Code, _cSharpParseOptions, cSharpResults[i].FilePath);
+            }
+
+            var compilation = _baseCompilation.AddSyntaxTrees(syntaxTrees);
+            var diagnostics = compilation.GetDiagnostics().Where(d => d.Severity > DiagnosticSeverity.Info).ToList();
+            if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+            {
+                return (new CompileToCSharpResult { Diagnostics = diagnostics.Select(CompilationDiagnostic.FromCSharpDiagnostic).ToList() }, null);
+            }
+
+            return (null, compilation.ToMetadataReference());
+        }
+
         private static CompileToAssemblyResult CompileToAssembly(IReadOnlyList<CompileToCSharpResult> cSharpResults)
         {
             if (cSharpResults.Any(r => r.Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error)))
@@ -160,7 +186,7 @@
 
             if (result.Diagnostics.All(x => x.Severity != DiagnosticSeverity.Error))
             {
-                using var peStream = new MemoryStream();
+                using var peStream = new MemoryStream(capacity: 512 * 1024);
                 finalCompilation.Emit(peStream);
 
                 result.AssemblyBytes = peStream.ToArray();
@@ -234,15 +260,15 @@
                 index++;
             }
 
-            // Result of doing 'temp' compilation
-            var tempAssembly = CompileToAssembly(declarations);
-            if (tempAssembly.Diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
+            // Result of doing 'temp' compilation (no emit needed — only used as a metadata reference)
+            var (tempErrors, tempRef) = CompileToMetadataReference(declarations);
+            if (tempErrors != null)
             {
-                return [new CompileToCSharpResult { Diagnostics = tempAssembly.Diagnostics }];
+                return [tempErrors];
             }
 
             // Add the 'temp' compilation as a metadata reference
-            var references = new List<MetadataReference>(_baseCompilation.References) { tempAssembly.Compilation.ToMetadataReference() };
+            var references = new List<MetadataReference>(_baseCompilation.References) { tempRef };
             projectEngine = CreateRazorProjectEngine(references);
 
             await (updateStatusFunc?.Invoke("Preparing Project") ?? Task.CompletedTask);
