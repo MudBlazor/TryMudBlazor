@@ -56,6 +56,8 @@
             ConfigurationName: "Blazor",
             Extensions: ImmutableArray<RazorExtension>.Empty);
 
+        private RazorProjectEngine _declarationProjectEngine;
+
         public static unsafe Task InitAsync()
         {
             if (_baseCompilation != null) return Task.CompletedTask;
@@ -195,7 +197,8 @@
             Func<string, Task> updateStatusFunc)
         {
             // The first phase won't include any metadata references for component discovery. This mirrors what the build does.
-            var projectEngine = this.CreateRazorProjectEngine(Array.Empty<MetadataReference>());
+            _declarationProjectEngine ??= this.CreateRazorProjectEngine(Array.Empty<MetadataReference>());
+            var projectEngine = _declarationProjectEngine;
 
             // Result of generating declarations
             var declarations = new CompileToCSharpResult[codeFiles.Count];
