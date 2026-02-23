@@ -101,6 +101,20 @@ window.Try = {
     dispose: function () {
         _dotNetInstance = null;
         window.removeEventListener('keydown', onKeyDown);
+    },
+    registerThemeListener: function (dotNetRef) {
+        this._themeListener = function (e) {
+            if (e.key === 'userPreferences') {
+                dotNetRef.invokeMethodAsync('RefreshTheme');
+            }
+        };
+        window.addEventListener('storage', this._themeListener);
+    },
+    unregisterThemeListener: function () {
+        if (this._themeListener) {
+            window.removeEventListener('storage', this._themeListener);
+            delete this._themeListener;
+        }
     }
 }
 

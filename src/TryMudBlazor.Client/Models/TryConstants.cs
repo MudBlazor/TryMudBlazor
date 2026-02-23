@@ -6,6 +6,8 @@
         public const string ChangeDisplayUrl = "Try.changeDisplayUrl";
         public const string ReloadIframe = "Try.reloadIframe";
         public const string Dispose = "Try.dispose";
+        public const string RegisterThemeListener = "Try.registerThemeListener";
+        public const string UnregisterThemeListener = "Try.unregisterThemeListener";
         public static class Editor
         {
             public const string Create = "Try.Editor.create";

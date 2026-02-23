@@ -285,9 +285,7 @@
             await LayoutService.ToggleDarkMode();
             string theme = LayoutService.IsDarkMode ? "vs-dark" : "default";
             await JsRuntime.InvokeVoidAsync(Try.Editor.SetTheme, theme);
-            // LayoutService calls StateHasChanged, we need the updated <style> tags for updateIframeTheme to work
-            await Task.Yield();
-            await JsRuntime.InvokeVoidAsync("updateIframeTheme");
+            // The iframe's EmptyLayout listens for the localStorage storage event and updates itself.
         }
 
         private void ClearCache()
