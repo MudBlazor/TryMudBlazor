@@ -49,6 +49,9 @@
         private static CSharpCompilation _baseCompilation;
         private static CSharpParseOptions _cSharpParseOptions;
 
+        private int _lastCodeHash;
+        private CompileToAssemblyResult _cachedResult;
+
         private readonly RazorProjectFileSystem fileSystem = new VirtualRazorProjectFileSystem();
         private readonly RazorConfiguration configuration = new(
             RazorLanguageVersion.Latest,
@@ -123,12 +126,32 @@
         {
             ArgumentNullException.ThrowIfNull(codeFiles);
 
+            var codeHash = ComputeCodeHash(codeFiles);
+            if (_cachedResult != null && _lastCodeHash == codeHash)
+            {
+                return _cachedResult;
+            }
+
             var cSharpResults = await this.CompileToCSharpAsync(codeFiles, updateStatusFunc);
 
             await (updateStatusFunc?.Invoke("Compiling Assembly") ?? Task.CompletedTask);
             var result = CompileToAssembly(cSharpResults);
 
+            _lastCodeHash = codeHash;
+            _cachedResult = result;
+
             return result;
+        }
+
+        private static int ComputeCodeHash(ICollection<CodeFile> codeFiles)
+        {
+            var hash = new HashCode();
+            foreach (var file in codeFiles)
+            {
+                hash.Add(file.Path);
+                hash.Add(file.Content);
+            }
+            return hash.ToHashCode();
         }
 
         // Compiles to a Roslyn compilation reference without emitting a PE image.
@@ -206,7 +229,10 @@
                 filePath = '/' + filePath;
             }
 
-            fileContent = fileContent.Replace("\r", string.Empty);
+            if (fileContent.Contains('\r'))
+            {
+                fileContent = fileContent.Replace("\r", string.Empty);
+            }
 
             return new VirtualProjectItem(
                 WorkingDirectory,
