@@ -69,59 +69,31 @@
             for (let i = 0; i < binaryString.length; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
             }
-
             return bytes;
         }
 
-        async function resolveUserComponentsAssemblyAssetName() {
-            const response = await fetch('_framework/dotnet.js', { cache: 'no-cache' });
-            const script = await response.text();
-            const startToken = '/*json-start*/';
-            const endToken = '/*json-end*/';
-            const start = script.indexOf(startToken);
-            const end = script.indexOf(endToken);
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri) {
+                if (!window.frameElement || window.location.pathname !== '/__main') {
+                    return defaultUri;
+                }
+                if (type !== 'assembly' || !name.startsWith('Try.UserComponents.')) {
+                    return defaultUri;
+                }
 
-            if (start < 0 || end <= start) {
-                return null;
-            }
+                const base64Dll = window.sessionStorage.getItem(userComponentsDllStorageKey);
+                if (!base64Dll) {
+                    return defaultUri;
+                }
 
-            const configJson = script.substring(start + startToken.length, end);
-            const config = JSON.parse(configJson);
-            const resources = config && config.resources ? config.resources : {};
-            const assemblies = []
-                .concat(Array.isArray(resources.coreAssembly) ? resources.coreAssembly : [])
-                .concat(Array.isArray(resources.assembly) ? resources.assembly : []);
-
-            const userComponentsAsset = assemblies.find(x => x && x.virtualPath === 'Try.UserComponents.dll');
-            return userComponentsAsset && userComponentsAsset.name ? userComponentsAsset.name : null;
-        }
-
-        resolveUserComponentsAssemblyAssetName()
-            .then(function (userComponentsAssemblyAssetName) {
-                return Blazor.start({
-                    loadBootResource: function (type, name, defaultUri) {
-                        if (!window.frameElement || window.location.pathname !== '/__main') {
-                            return defaultUri;
-                        }
-                        if (type !== 'assembly' || name !== userComponentsAssemblyAssetName) {
-                            return defaultUri;
-                        }
-
-                        const base64Dll = window.sessionStorage.getItem(userComponentsDllStorageKey);
-                        if (!base64Dll) {
-                            return defaultUri;
-                        }
-
-                        const dllBytes = base64ToBytes(base64Dll);
-                        return Promise.resolve(new Response(dllBytes, {
-                            headers: {
-                                'Content-Type': 'application/octet-stream'
-                            }
-                        }));
+                const dllBytes = base64ToBytes(base64Dll);
+                return Promise.resolve(new Response(dllBytes, {
+                    headers: {
+                        'Content-Type': 'application/octet-stream'
                     }
-                });
-            })
-            .catch(error => console.error(error));
+                }));
+            }
+        }).catch(error => console.error(error));
 
         function updateIframeTheme() {
             const mudblazorTheme = parent.document.querySelector('.mud-theme-provider') || parent.document.getElementsByTagName('style')[3];
