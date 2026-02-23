@@ -193,6 +193,7 @@ window.Try.Editor = window.Try.Editor || (function () {
 
 window.Try.CodeExecution = window.Try.CodeExecution || (function () {
     const UNEXPECTED_ERROR_MESSAGE = 'An unexpected error has occurred. Please try again later or contact the team.';
+    const USER_COMPONENTS_DLL_STORAGE_KEY = 'TryMudBlazor.UserComponentsDllBase64';
 
     function putInCacheStorage(cache, fileName, fileBytes, contentType) {
         const cachedResponse = new Response(
@@ -219,43 +220,66 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
         return bytes;
     }
 
+    function convertBytesToBase64String(bytes) {
+        let binaryString = '';
+        for (let i = 0; i < bytes.length; i++) {
+            binaryString += String.fromCharCode(bytes[i]);
+        }
+
+        return window.btoa(binaryString);
+    }
+
     return {
         getCompilationDlls: async function (dllNames) {
-            const cache = await caches.open(CACHE_NAME);
-            const keys = await cache.keys();
-            const dllsData = [];
-            await Promise.all(dllNames.map(async (dll) => {
-                // Requires WasmFingerprintAssets to be enabled
-                const pattern = new RegExp(`${dll}.[^\\.]*\\.dll`, 'i');
-                const dllKey = keys.find(x => pattern.test(x.url)).url.substring(window.location.origin.length);
-                const response = await cache.match(dllKey);
-                const bytes = new Uint8Array(await response.arrayBuffer());
-                dllsData.push(bytes);
-            }));
+            const config = window.Blazor && Blazor.runtime && Blazor.runtime.getConfig ? Blazor.runtime.getConfig() : null;
+            const resources = config && config.resources ? config.resources : {};
 
-            return dllsData;
+            const getAssemblyAssetName = (simpleName) => {
+                const virtualName = `${simpleName}.dll`;
+                const arrayGroups = [resources.coreAssembly, resources.assembly].filter(Array.isArray);
+                for (const group of arrayGroups) {
+                    const asset = group.find(x => x && (x.virtualPath === virtualName || x.name === virtualName));
+                    if (asset && asset.name) {
+                        return asset.name;
+                    }
+                }
+                throw new Error(`.NET 10 boot config assembly asset not found for '${virtualName}'`);
+            };
+
+            const fetchDllBytes = async (dllName) => {
+                const assetName = getAssemblyAssetName(dllName);
+                const urls = [
+                    `_framework/${assetName}`,
+                    `_framework/${dllName}.dll`
+                ];
+
+                for (const url of urls) {
+                    const response = await fetch(url, { cache: 'force-cache' });
+                    if (response && response.ok) {
+                        return new Uint8Array(await response.arrayBuffer());
+                    }
+                }
+
+                throw new Error(`Failed to fetch compilation DLL '${dllName}' (resolved '${assetName}')`);
+            };
+
+            return Promise.all(dllNames.map(dll => fetchDllBytes(dll)));
         },
 
         updateUserComponentsDll: async function (fileContent) {
             if (!fileContent) {
                 return;
             }
-
-            const cache = await caches.open(CACHE_NAME);
-
-            const cacheKeys = await cache.keys();
-            // Requires WasmFingerprintAssets to be enabled
-            const userComponentsDllCacheKey = cacheKeys.find(x => /Try\.UserComponents\.[^/]*\.dll/.test(x.url));
-            if (!userComponentsDllCacheKey || !userComponentsDllCacheKey.url) {
-                alert(UNEXPECTED_ERROR_MESSAGE);
-                return;
-            }
-
-            const dllPath = userComponentsDllCacheKey.url.substring(window.location.origin.length);
             fileContent = typeof fileContent === 'number' ? BINDING.conv_string(fileContent) : fileContent // tranfering raw pointer to the memory of the mono string
             const dllBytes = typeof fileContent === 'string' ? convertBase64StringToBytes(fileContent) : fileContent;
+            const dllBase64 = convertBytesToBase64String(dllBytes);
 
-            await putInCacheStorage(cache, dllPath, dllBytes);
+            try {
+                window.sessionStorage.setItem(USER_COMPONENTS_DLL_STORAGE_KEY, dllBase64);
+            } catch (error) {
+                console.error('Failed to store compiled user components DLL', error);
+                alert(UNEXPECTED_ERROR_MESSAGE);
+            }
         }
     };
 }());
