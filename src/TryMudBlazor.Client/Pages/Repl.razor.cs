@@ -163,7 +163,7 @@
             this.Loading = true;
             this.LoaderText = "Processing";
 
-            await Task.Delay(10); // Ensure rendering has time to be called
+            await Task.Yield();
 
             CompileToAssemblyResult compilationResult = null;
             CodeFile mainComponent = null;
@@ -271,13 +271,13 @@
             this.activeCodeFile.Content = this.CodeEditorComponent.GetCode();
         }
 
-        private Task UpdateLoaderTextAsync(string loaderText)
+        private async Task UpdateLoaderTextAsync(string loaderText)
         {
             this.LoaderText = loaderText;
 
             this.StateHasChanged();
 
-            return Task.Delay(10); // Ensure rendering has time to be called
+            await Task.Yield();
         }
 
         private async Task UpdateTheme()
