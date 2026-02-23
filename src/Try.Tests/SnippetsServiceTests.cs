@@ -42,7 +42,7 @@ namespace Tests
         [Ignore("Investigate failure")]
         public async Task TestGet()
         {
-            var snippetService = new SnippetsService(snippetsOptions, new System.Net.Http.HttpClient(), new MockNavigationManager());
+            var snippetService = new SnippetsService(snippetsOptions, new HttpClient(), new MockNavigationManager());
             var codeFiles = await snippetService.GetSnippetContentAsync("2021020540572059");
             Assert.That(codeFiles, Is.Not.Null);
         }
@@ -51,7 +51,7 @@ namespace Tests
         [Ignore("Investigate failure")]
         public async Task TestPut()
         {
-            var snippetService = new SnippetsService(snippetsOptions, new System.Net.Http.HttpClient(), new MockNavigationManager());
+            var snippetService = new SnippetsService(snippetsOptions, new HttpClient(), new MockNavigationManager());
             var id = await snippetService.SaveSnippetAsync(codeFiles);
             Assert.That(id, Is.Not.Null);
             Console.WriteLine(id);

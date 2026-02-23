@@ -75,7 +75,7 @@ namespace TryMudBlazor.Client.Components
             }
         }
 
-        private async void OnClose()
+        private async Task OnClose()
         {
             Loading = false;
             SnippetLink = string.Empty;
