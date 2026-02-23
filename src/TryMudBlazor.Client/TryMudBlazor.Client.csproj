@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PublishTrimmed>false</PublishTrimmed>
-    <WasmEnableWebcil>false</WasmEnableWebcil>
+    <WasmEnableWebcil>true</WasmEnableWebcil>
   </PropertyGroup>
 
   <ItemGroup>
