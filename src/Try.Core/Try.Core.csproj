@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.CodeAnalysis.Razor.Test</AssemblyName>
     <KeyOriginatorFile>$(PkgMicrosoft_DotNet_Arcade_Sdk)\tools\snk\AspNetCore.snk</KeyOriginatorFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

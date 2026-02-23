@@ -8,6 +8,8 @@
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using System.Reflection;
+    using System.Reflection.Metadata;
     using System.Runtime;
     using System.Text;
     using System.Threading.Tasks;
@@ -54,7 +56,7 @@
             ConfigurationName: "Blazor",
             Extensions: ImmutableArray<RazorExtension>.Empty);
 
-        public static async Task InitAsync(Func<IReadOnlyCollection<string>, ValueTask<IReadOnlyList<byte[]>>> getReferencedDllsBytesFunc)
+        public static unsafe Task InitAsync()
         {
             var basicReferenceAssemblyRoots = new[]
             {
@@ -71,22 +73,32 @@
                 typeof(WebAssemblyHostBuilder).Assembly, // Microsoft.AspNetCore.Components.WebAssembly
                 typeof(FluentValidation.AbstractValidator<>).Assembly,
             };
-            var assemblyNames = await getReferencedDllsBytesFunc(basicReferenceAssemblyRoots
-                .SelectMany(assembly => assembly.GetReferencedAssemblies().Concat(
-                [
-                    assembly.GetName()
-                ]))
-                .Select(assemblyName => assemblyName.Name)
-                .ToHashSet());
 
-            var basicReferenceAssemblies = assemblyNames
-                .Select(peImage => MetadataReference.CreateFromImage(peImage, MetadataReferenceProperties.Assembly))
-                .ToList();
+            var assemblyNames = basicReferenceAssemblyRoots
+                .SelectMany(assembly => assembly.GetReferencedAssemblies().Concat([assembly.GetName()]))
+                .Select(assemblyName => assemblyName.Name!)
+                .ToHashSet();
+
+            // netstandard facade is needed for libraries that target netstandard2.0
+            assemblyNames.Add("netstandard");
+
+            var loadedByName = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic && a.GetName().Name != null)
+                .ToDictionary(a => a.GetName().Name!, StringComparer.OrdinalIgnoreCase);
+
+            var references = new List<MetadataReference>();
+            foreach (var name in assemblyNames)
+            {
+                if (!loadedByName.TryGetValue(name, out var assembly)) continue;
+                if (!assembly.TryGetRawMetadata(out byte* blob, out int length)) continue;
+                var moduleMetadata = ModuleMetadata.CreateFromMetadata((IntPtr)blob, length);
+                references.Add(AssemblyMetadata.Create(moduleMetadata).GetReference());
+            }
 
             _baseCompilation = CSharpCompilation.Create(
                 DefaultRootNamespace,
                 Array.Empty<SyntaxTree>(),
-                basicReferenceAssemblies,
+                references,
                 new CSharpCompilationOptions(
                     OutputKind.DynamicallyLinkedLibrary,
                     optimizationLevel: OptimizationLevel.Release,
@@ -99,6 +111,7 @@
                     }));
 
             _cSharpParseOptions = new CSharpParseOptions(LanguageVersion.Preview);
+            return Task.CompletedTask;
         }
 
         public async Task<CompileToAssemblyResult> CompileToAssemblyAsync(

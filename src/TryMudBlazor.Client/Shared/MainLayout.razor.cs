@@ -3,11 +3,9 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using Microsoft.JSInterop;
     using MudBlazor;
     using Services;
     using Try.Core;
-    using static TryMudBlazor.Client.Models.Try;
 
     public partial class MainLayout : LayoutComponentBase, IDisposable
     {
@@ -15,9 +13,6 @@
 
         [Inject]
         private LayoutService LayoutService { get; set; }
-
-        [Inject]
-        private IJSRuntime JsRuntime { get; set; }
 
         protected override void OnInitialized()
         {
@@ -32,14 +27,9 @@
             if (firstRender)
             {
                 await ApplyUserPreferences();
-                await CompilationService.InitAsync(GetReferenceAssembliesStreamsAsync);
+                await CompilationService.InitAsync();
                 StateHasChanged();
             }
-        }
-
-        private ValueTask<IReadOnlyList<byte[]>> GetReferenceAssembliesStreamsAsync(IReadOnlyCollection<string> referenceAssemblyNames)
-        {
-            return JsRuntime.InvokeAsync<IReadOnlyList<byte[]>>(CodeExecution.GetCompilationDlls, new List<string>(referenceAssemblyNames) { "netstandard" });
         }
 
         private async Task ApplyUserPreferences()

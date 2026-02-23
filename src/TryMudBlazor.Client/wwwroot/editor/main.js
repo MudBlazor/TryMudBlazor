@@ -230,42 +230,6 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
     }
 
     return {
-        getCompilationDlls: async function (dllNames) {
-            const config = window.Blazor && Blazor.runtime && Blazor.runtime.getConfig ? Blazor.runtime.getConfig() : null;
-            const resources = config && config.resources ? config.resources : {};
-
-            const getAssemblyAssetName = (simpleName) => {
-                const virtualName = `${simpleName}.dll`;
-                const arrayGroups = [resources.coreAssembly, resources.assembly].filter(Array.isArray);
-                for (const group of arrayGroups) {
-                    const asset = group.find(x => x && (x.virtualPath === virtualName || x.name === virtualName));
-                    if (asset && asset.name) {
-                        return asset.name;
-                    }
-                }
-                throw new Error(`.NET 10 boot config assembly asset not found for '${virtualName}'`);
-            };
-
-            const fetchDllBytes = async (dllName) => {
-                const assetName = getAssemblyAssetName(dllName);
-                const urls = [
-                    `_framework/${assetName}`,
-                    `_framework/${dllName}.dll`
-                ];
-
-                for (const url of urls) {
-                    const response = await fetch(url, { cache: 'force-cache' });
-                    if (response && response.ok) {
-                        return new Uint8Array(await response.arrayBuffer());
-                    }
-                }
-
-                throw new Error(`Failed to fetch compilation DLL '${dllName}' (resolved '${assetName}')`);
-            };
-
-            return Promise.all(dllNames.map(dll => fetchDllBytes(dll)));
-        },
-
         updateUserComponentsDll: async function (fileContent) {
             if (!fileContent) {
                 return;

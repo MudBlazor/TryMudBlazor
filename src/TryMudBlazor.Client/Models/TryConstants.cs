@@ -19,7 +19,6 @@
 
         public static class CodeExecution
         {
-            public const string GetCompilationDlls = "Try.CodeExecution.getCompilationDlls";
             public const string UpdateUserComponentsDll = "Try.CodeExecution.updateUserComponentsDll";
         }
     }
