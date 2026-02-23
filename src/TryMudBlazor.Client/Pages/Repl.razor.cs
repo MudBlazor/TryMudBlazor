@@ -280,11 +280,11 @@
             return Task.Delay(10); // Ensure rendering has time to be called
         }
 
-        private async void UpdateTheme()
+        private async Task UpdateTheme()
         {
             await LayoutService.ToggleDarkMode();
             string theme = LayoutService.IsDarkMode ? "vs-dark" : "default";
-            this.JsRuntime.InvokeVoid(Try.Editor.SetTheme, theme);
+            await JsRuntime.InvokeVoidAsync(Try.Editor.SetTheme, theme);
             // LayoutService calls StateHasChanged, we need the updated <style> tags for updateIframeTheme to work
             await Task.Yield();
             await JsRuntime.InvokeVoidAsync("updateIframeTheme");
