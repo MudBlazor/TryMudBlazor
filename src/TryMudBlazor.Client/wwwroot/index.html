@@ -91,25 +91,6 @@
             }
         }).catch(error => console.error(error));
 
-        function updateIframeTheme() {
-            const mudblazorTheme = parent.document.querySelector('.mud-theme-provider') || parent.document.getElementsByTagName('style')[3];
-
-            if (mudblazorTheme) {
-                // Find the iframe
-                const userPageIframe = parent.document.getElementById('user-page-window');
-
-                if (userPageIframe && userPageIframe.contentDocument) {
-                    const iframeDoc = userPageIframe.contentDocument;
-                    const iFrameTheme = iframeDoc.querySelector('.mud-theme-provider') || iframeDoc.getElementsByTagName('style')[2];
-
-                    if (iFrameTheme) {
-                        iFrameTheme.innerHTML = mudblazorTheme.innerHTML;
-                    } 
-                } 
-            } else {
-                console.error('Could not find the parent theme element.');
-            }
-        }
     </script>
 </body>
 

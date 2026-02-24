@@ -1,5 +1,8 @@
-﻿@using TryMudBlazor.Client.Services
+@using Microsoft.JSInterop
+@using TryMudBlazor.Client.Services
+@using TryMudBlazor.Client.Models
 @inherits LayoutComponentBase
+@implements IAsyncDisposable
 
 <MudThemeProvider IsDarkMode="@LayoutService.IsDarkMode" />
 <MudPopoverProvider />
@@ -12,10 +15,36 @@
 
 @code {
 	[Inject] private LayoutService LayoutService { get; set; }
+	[Inject] private IJSRuntime JSRuntime { get; set; }
+
+	private DotNetObjectReference<EmptyLayout> _dotNetRef;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await LayoutService.ApplyUserPreferences(false);
 		await base.OnInitializedAsync();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_dotNetRef = DotNetObjectReference.Create(this);
+			await JSRuntime.InvokeVoidAsync(Try.RegisterThemeListener, _dotNetRef);
+		}
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+	[JSInvokable]
+	public async Task RefreshTheme()
+	{
+		await LayoutService.ApplyUserPreferences(false);
+		StateHasChanged();
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		await JSRuntime.InvokeVoidAsync(Try.UnregisterThemeListener);
+		_dotNetRef?.Dispose();
 	}
 }
