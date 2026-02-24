@@ -1,5 +1,4 @@
 @page "/__main"
-@using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
 @using System.Runtime.Loader
 @using Try.UserComponents
@@ -13,15 +12,19 @@
 
 @code {
     private Type _type = typeof(__Main);
-    private DotNetObjectReference<UserMainPage> _ref;
     private AssemblyLoadContext _loadContext;
+    private readonly Lazy<DotNetObjectReference<UserMainPage>> _ref;
+
+    public UserMainPage()
+    {
+        _ref = new Lazy<DotNetObjectReference<UserMainPage>>(CreateDotNetObject());
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _ref = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("Try.registerHotReload", _ref);
+            await JSRuntime.InvokeVoidAsync("Try.registerHotReload", _ref.Value);
         }
     }
 
@@ -43,15 +46,15 @@
             previousContext?.Unload();
 
             // UserStartup requires DI re-registration — fall back to full iframe reload
-            if (assembly.GetType("UserStartup") != null ||
-                assembly.GetType("Try.UserComponents.UserStartup") != null)
+            if (assembly.GetType("UserStartup") is not null ||
+                assembly.GetType("Try.UserComponents.UserStartup") is not null)
             {
                 await JSRuntime.InvokeVoidAsync("Try.requestFullReload", "/__main");
                 return;
             }
 
             var newType = assembly.GetType("Try.UserComponents.__Main");
-            if (newType != null)
+            if (newType is not null)
             {
                 _type = newType;
                 await InvokeAsync(StateHasChanged);
@@ -65,7 +68,12 @@
 
     public void Dispose()
     {
-        _ref?.Dispose();
+        if (_ref.IsValueCreated)
+        {
+            _ref.Value.Dispose();
+        }
         _loadContext?.Unload();
     }
+
+    private DotNetObjectReference<UserMainPage> CreateDotNetObject() => DotNetObjectReference.Create(this);
 }
