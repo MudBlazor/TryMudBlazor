@@ -1,21 +1,17 @@
-namespace TryMudBlazor.Client.Services
+using System.Reflection;
+using Try.UserComponents;
+
+namespace TryMudBlazor.Client.Services;
+
+public class UserComponentsAssemblyService
 {
-    using System;
-    using System.Reflection;
-    using Try.UserComponents;
+    public event Action OnAssemblyChanged;
 
-    public class UserComponentsAssemblyService
+    public Assembly Assembly { get; private set; } = typeof(__Main).Assembly;
+
+    public void UpdateAssembly(Assembly assembly)
     {
-        private Assembly _assembly = typeof(__Main).Assembly;
-
-        public event Action OnAssemblyChanged;
-
-        public Assembly Assembly => _assembly;
-
-        public void UpdateAssembly(Assembly assembly)
-        {
-            _assembly = assembly;
-            OnAssemblyChanged?.Invoke();
-        }
+        Assembly = assembly;
+        OnAssemblyChanged?.Invoke();
     }
 }

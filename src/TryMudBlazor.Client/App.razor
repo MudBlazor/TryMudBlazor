@@ -1,6 +1,5 @@
 @using System.Reflection
 @using TryMudBlazor.Client.Services
-@inject UserComponentsAssemblyService AssemblyService
 @implements IDisposable
 
 <Router AppAssembly="@typeof(Program).Assembly"
@@ -16,22 +15,28 @@
 </Router>
 
 @code {
-    private Assembly[] _additionalAssemblies = [];
+    private Assembly[] _additionalAssemblies;
+    private readonly UserComponentsAssemblyService _assemblyService;
+
+    public App(UserComponentsAssemblyService assemblyService)
+    {
+        _assemblyService = assemblyService;
+        assemblyService.OnAssemblyChanged += HandleAssemblyChanged;
+        _additionalAssemblies = [assemblyService.Assembly];
+    }
 
     protected override void OnInitialized()
     {
-        _additionalAssemblies = [AssemblyService.Assembly];
-        AssemblyService.OnAssemblyChanged += HandleAssemblyChanged;
     }
 
     private void HandleAssemblyChanged()
     {
-        _additionalAssemblies = [AssemblyService.Assembly];
+        _additionalAssemblies = [_assemblyService.Assembly];
         InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        AssemblyService.OnAssemblyChanged -= HandleAssemblyChanged;
+        _assemblyService.OnAssemblyChanged -= HandleAssemblyChanged;
     }
 }
