@@ -116,6 +116,10 @@ window.Try = {
         window._hotReloadRef = dotNetRef;
         window._hotReloadReady = true;
     },
+    unregisterHotReload: function () {
+        window._hotReloadRef = null;
+        window._hotReloadReady = false;
+    },
     requestFullReload: function (src) {
         window.parent.Try.reloadIframe('user-page-window', src);
     },

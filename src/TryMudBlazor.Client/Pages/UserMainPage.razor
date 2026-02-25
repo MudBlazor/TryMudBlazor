@@ -5,7 +5,7 @@
 @using TryMudBlazor.Client.Services
 @inject IJSRuntime JSRuntime
 @inject UserComponentsAssemblyService AssemblyService
-@implements IDisposable
+@implements IAsyncDisposable
 
 <MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.ExtraSmall" />
 <MudSnackbarProvider />
@@ -71,10 +71,11 @@
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         if (_ref.IsValueCreated)
         {
+            await JSRuntime.InvokeVoidAsync("Try.unregisterHotReload");
             _ref.Value.Dispose();
         }
         _loadContext?.Unload();
