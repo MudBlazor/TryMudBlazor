@@ -5,13 +5,27 @@ namespace TryMudBlazor.Client.Services;
 
 public class UserComponentsAssemblyService
 {
-    public event Action OnAssemblyChanged;
+    private readonly List<Func<Assembly, Task>> _callbacks = [];
 
     public Assembly Assembly { get; private set; } = typeof(__Main).Assembly;
 
-    public void UpdateAssembly(Assembly assembly)
+    public IDisposable Subscribe(Func<Assembly, Task> callback)
+    {
+        _callbacks.Add(callback);
+        return new Subscription(() => _callbacks.Remove(callback));
+    }
+
+    public async Task UpdateAssemblyAsync(Assembly assembly)
     {
         Assembly = assembly;
-        OnAssemblyChanged?.Invoke();
+        foreach (var callback in _callbacks)
+        {
+            await callback(assembly);
+        }
+    }
+
+    private sealed class Subscription(Action unsubscribe) : IDisposable
+    {
+        public void Dispose() => unsubscribe();
     }
 }

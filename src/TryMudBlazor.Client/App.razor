@@ -15,28 +15,23 @@
 </Router>
 
 @code {
-    private Assembly[] _additionalAssemblies;
-    private readonly UserComponentsAssemblyService _assemblyService;
+    private readonly Assembly[] _additionalAssemblies;
+    private readonly IDisposable _subscription;
 
     public App(UserComponentsAssemblyService assemblyService)
     {
-        _assemblyService = assemblyService;
-        assemblyService.OnAssemblyChanged += HandleAssemblyChanged;
         _additionalAssemblies = [assemblyService.Assembly];
+        _subscription = assemblyService.Subscribe(HandleAssemblyChanged);
     }
 
-    protected override void OnInitialized()
+    private Task HandleAssemblyChanged(Assembly assembly)
     {
-    }
-
-    private void HandleAssemblyChanged()
-    {
-        _additionalAssemblies = [_assemblyService.Assembly];
-        InvokeAsync(StateHasChanged);
+        _additionalAssemblies[0] = assembly;
+        return InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        _assemblyService.OnAssemblyChanged -= HandleAssemblyChanged;
+        _subscription.Dispose();
     }
 }

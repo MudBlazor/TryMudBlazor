@@ -60,7 +60,7 @@
             {
                 // Update the Router's AdditionalAssemblies before rendering the new __Main
                 // so that any NavigateTo calls inside it can resolve user-defined @page routes.
-                AssemblyService.UpdateAssembly(assembly);
+                await AssemblyService.UpdateAssemblyAsync(assembly);
                 _type = newType;
                 await InvokeAsync(StateHasChanged);
             }
