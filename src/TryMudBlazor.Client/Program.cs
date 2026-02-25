@@ -32,6 +32,7 @@ namespace TryMudBlazor.Client
             builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddScoped<SnippetsService>();
             builder.Services.AddSingleton(new CompilationService());
+            builder.Services.AddSingleton<UserComponentsAssemblyService>();
 
             builder.Services
                 .AddOptions<SnippetsOptions>()

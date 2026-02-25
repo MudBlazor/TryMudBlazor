@@ -1,4 +1,10 @@
-<Router AppAssembly="@typeof(Program).Assembly">
+@using System.Reflection
+@using TryMudBlazor.Client.Services
+@inject UserComponentsAssemblyService AssemblyService
+@implements IDisposable
+
+<Router AppAssembly="@typeof(Program).Assembly"
+        AdditionalAssemblies="@_additionalAssemblies">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(EmptyLayout)" />
     </Found>
@@ -8,3 +14,24 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    private Assembly[] _additionalAssemblies = [];
+
+    protected override void OnInitialized()
+    {
+        _additionalAssemblies = [AssemblyService.Assembly];
+        AssemblyService.OnAssemblyChanged += HandleAssemblyChanged;
+    }
+
+    private void HandleAssemblyChanged()
+    {
+        _additionalAssemblies = [AssemblyService.Assembly];
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AssemblyService.OnAssemblyChanged -= HandleAssemblyChanged;
+    }
+}

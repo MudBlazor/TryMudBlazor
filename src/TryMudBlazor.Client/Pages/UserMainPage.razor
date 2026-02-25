@@ -2,7 +2,9 @@
 @using Microsoft.JSInterop
 @using System.Runtime.Loader
 @using Try.UserComponents
+@using TryMudBlazor.Client.Services
 @inject IJSRuntime JSRuntime
+@inject UserComponentsAssemblyService AssemblyService
 @implements IDisposable
 
 <MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.ExtraSmall" />
@@ -56,6 +58,9 @@
             var newType = assembly.GetType("Try.UserComponents.__Main");
             if (newType is not null)
             {
+                // Update the Router's AdditionalAssemblies before rendering the new __Main
+                // so that any NavigateTo calls inside it can resolve user-defined @page routes.
+                AssemblyService.UpdateAssembly(assembly);
                 _type = newType;
                 await InvokeAsync(StateHasChanged);
             }
