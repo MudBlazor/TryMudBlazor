@@ -215,6 +215,9 @@ window.Try.CodeExecution = window.Try.CodeExecution || (function () {
                 Try.reloadIframe(id, fallbackSrc);
             }
         },
+        clearUserComponentsDll: function () {
+            window.sessionStorage.removeItem(USER_COMPONENTS_DLL_STORAGE_KEY);
+        },
         updateUserComponentsDll: function (dllData) {
             if (!dllData) return;
 

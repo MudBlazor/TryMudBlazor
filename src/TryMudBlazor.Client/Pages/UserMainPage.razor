@@ -36,7 +36,13 @@
         try
         {
             var base64 = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "TryMudBlazor.UserComponentsDllBase64");
-            if (base64 == null) return;
+            if (base64 == null)
+            {
+                // sessionStorage was cleared (e.g. crash recovery) — fall back to a full reload
+                // so loadBootResource picks up the safe static DLL.
+                await JSRuntime.InvokeVoidAsync("Try.requestFullReload", "/__main");
+                return;
+            }
 
             var bytes = Convert.FromBase64String(base64);
 

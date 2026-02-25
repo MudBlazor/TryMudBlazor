@@ -57,7 +57,7 @@ namespace TryMudBlazor.Client
                 var actualException = exception is TargetInvocationException tie ? tie.InnerException : exception;
                 await Console.Error.WriteLineAsync($"Error on app startup: {actualException}");
 
-                jsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDll, CoreConstants.DefaultUserComponentsAssemblyBytes);
+                jsRuntime.InvokeVoid(Try.CodeExecution.ClearUserComponentsDll);
             }
 
             await builder.Build().RunAsync();
