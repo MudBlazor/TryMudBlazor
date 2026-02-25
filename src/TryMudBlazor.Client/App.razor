@@ -1,17 +1,14 @@
 @using System.Reflection
+@using TryMudBlazor.Client.Pages
 @using TryMudBlazor.Client.Services
 @implements IDisposable
 
 <Router AppAssembly="@typeof(Program).Assembly"
-        AdditionalAssemblies="@_additionalAssemblies">
+        AdditionalAssemblies="@_additionalAssemblies"
+        NotFoundPage="typeof(NotFound)">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(EmptyLayout)" />
     </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(EmptyLayout)">
-            <p>Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
 </Router>
 
 @code {
