@@ -17,6 +17,7 @@ namespace TryMudBlazor.Client
     using Services.UserPreferences;
     using Try.Core;
     using Try.UserComponents;
+    using TryMudBlazor.Client.Extensions;
     using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
 
@@ -47,7 +48,7 @@ namespace TryMudBlazor.Client
             var jsRuntime = GetJsRuntime();
             try
             {
-                ExecuteUserDefinedConfiguration(builder);
+                builder.TryInvokeUserStartup();
             }
             catch (Exception exception)
             {
@@ -60,22 +61,6 @@ namespace TryMudBlazor.Client
             }
 
             await builder.Build().RunAsync();
-        }
-
-        private static void ExecuteUserDefinedConfiguration(WebAssemblyHostBuilder builder)
-        {
-            var userComponentsAssembly = typeof(__Main).Assembly;
-            var startupType = userComponentsAssembly.GetType("UserStartup", throwOnError: false, ignoreCase: true)
-                              ?? userComponentsAssembly.GetType("Try.UserComponents.UserStartup", throwOnError: false, ignoreCase: true);
-            if (startupType == null)
-                return;
-            var configureMethod = startupType.GetMethod("Configure", BindingFlags.Static | BindingFlags.Public);
-            if (configureMethod == null)
-                return;
-            var configureMethodParams = configureMethod.GetParameters();
-            if (configureMethodParams.Length != 1 || configureMethodParams[0].ParameterType != typeof(WebAssemblyHostBuilder))
-                return;
-            configureMethod.Invoke(obj: null, new object[] { builder });
         }
 
         private static IJSInProcessRuntime GetJsRuntime()
