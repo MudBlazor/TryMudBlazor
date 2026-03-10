@@ -10,5 +10,7 @@
         public IEnumerable<CompilationDiagnostic> Diagnostics { get; set; } = [];
 
         public byte[] AssemblyBytes { get; set; }
+
+        public bool IsFromCache { get; set; }
     }
 }

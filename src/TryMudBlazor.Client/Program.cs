@@ -17,6 +17,7 @@ namespace TryMudBlazor.Client
     using Services.UserPreferences;
     using Try.Core;
     using Try.UserComponents;
+    using TryMudBlazor.Client.Extensions;
     using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
 
@@ -32,6 +33,7 @@ namespace TryMudBlazor.Client
             builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddScoped<SnippetsService>();
             builder.Services.AddSingleton(new CompilationService());
+            builder.Services.AddSingleton<UserComponentsAssemblyService>();
 
             builder.Services
                 .AddOptions<SnippetsOptions>()
@@ -46,7 +48,7 @@ namespace TryMudBlazor.Client
             var jsRuntime = GetJsRuntime();
             try
             {
-                ExecuteUserDefinedConfiguration(builder);
+                builder.TryInvokeUserStartup();
             }
             catch (Exception exception)
             {
@@ -55,26 +57,10 @@ namespace TryMudBlazor.Client
                 var actualException = exception is TargetInvocationException tie ? tie.InnerException : exception;
                 await Console.Error.WriteLineAsync($"Error on app startup: {actualException}");
 
-                jsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDll, CoreConstants.DefaultUserComponentsAssemblyBytes);
+                jsRuntime.InvokeVoid(Try.CodeExecution.ClearUserComponentsDll);
             }
 
             await builder.Build().RunAsync();
-        }
-
-        private static void ExecuteUserDefinedConfiguration(WebAssemblyHostBuilder builder)
-        {
-            var userComponentsAssembly = typeof(__Main).Assembly;
-            var startupType = userComponentsAssembly.GetType("UserStartup", throwOnError: false, ignoreCase: true)
-                              ?? userComponentsAssembly.GetType("Try.UserComponents.UserStartup", throwOnError: false, ignoreCase: true);
-            if (startupType == null)
-                return;
-            var configureMethod = startupType.GetMethod("Configure", BindingFlags.Static | BindingFlags.Public);
-            if (configureMethod == null)
-                return;
-            var configureMethodParams = configureMethod.GetParameters();
-            if (configureMethodParams.Length != 1 || configureMethodParams[0].ParameterType != typeof(WebAssemblyHostBuilder))
-                return;
-            configureMethod.Invoke(obj: null, new object[] { builder });
         }
 
         private static IJSInProcessRuntime GetJsRuntime()

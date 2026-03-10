@@ -1,11 +1,34 @@
+@using System.Reflection
+@using TryMudBlazor.Client.Pages
+@using TryMudBlazor.Client.Services
+@implements IDisposable
+
 <Router AppAssembly="@typeof(Program).Assembly"
-        AdditionalAssemblies="@(new List<System.Reflection.Assembly> { typeof(Try.UserComponents.__Main).Assembly })">
+        AdditionalAssemblies="@_additionalAssemblies"
+        NotFoundPage="typeof(NotFound)">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(EmptyLayout)" />
     </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(EmptyLayout)">
-            <p>Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
 </Router>
+
+@code {
+    private readonly Assembly[] _additionalAssemblies;
+    private readonly IDisposable _subscription;
+
+    public App(UserComponentsAssemblyService assemblyService)
+    {
+        _additionalAssemblies = [assemblyService.Assembly];
+        _subscription = assemblyService.Subscribe(HandleAssemblyChanged);
+    }
+
+    private Task HandleAssemblyChanged(Assembly assembly)
+    {
+        _additionalAssemblies[0] = assembly;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _subscription.Dispose();
+    }
+}

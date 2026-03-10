@@ -24,10 +24,13 @@
     <meta name="twitter:description" content="TryMudBlazor is a fiddle-like platform for writing, compiling, executing and sharing Blazor components entirely in the browser. Perfect for code playground and testing.">
     <meta name="twitter:image" content="https://mudblazor.com/_content/MudBlazor.Docs/images/logo.png">
 
+    <link rel="preload" id="webassembly" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400" rel="stylesheet">
     <link href="_content/MudBlazor/MudBlazor.min.css?v=#{CACHE_TOKEN}#" rel="stylesheet" />
     <link href="css/TryMudBlazor.min.css?v=#{CACHE_TOKEN}#" rel="stylesheet" />
     <script src="lib/split.js/split.min.js"></script>
@@ -42,6 +45,7 @@
 
         gtag('config', 'G-33J60J6E14');
     </script>
+    <script type="importmap"></script>
 </head>
 
 <body class="mud-height-full">
@@ -57,9 +61,9 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js?v=#{CACHE_TOKEN}#"></script>
-    <script src="editor/main.js?v=#{CACHE_TOKEN}#"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
+    <script src="_content/MudBlazor/MudBlazor.min#[.{fingerprint}].js"></script>
+    <script src="editor/main#[.{fingerprint}].js"></script>
     <script type="text/javascript">
         const userComponentsDllStorageKey = 'TryMudBlazor.UserComponentsDllBase64';
 

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <PublishTrimmed>false</PublishTrimmed>
     <WasmEnableWebcil>true</WasmEnableWebcil>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
   </PropertyGroup>
 
   <ItemGroup>

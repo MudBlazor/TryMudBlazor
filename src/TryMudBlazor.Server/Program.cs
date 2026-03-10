@@ -36,9 +36,7 @@ public class Program
 
         app.UseCors();
 
-        // Needed for wasm project
-        app.UseBlazorFrameworkFiles();
-        app.UseStaticFiles();
+        app.MapStaticAssets();
 
         app.MapControllers();
 

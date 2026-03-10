@@ -18,7 +18,6 @@
     {
         [Inject] private LayoutService LayoutService { get; set; }
 
-        private const string MainComponentCodePrefix = "@page \"/__main\"\n";
         private const string MainUserPagePath = "/__main";
 
         private DotNetObjectReference<Repl> dotNetInstance;
@@ -166,18 +165,9 @@
             await Task.Yield();
 
             CompileToAssemblyResult compilationResult = null;
-            CodeFile mainComponent = null;
-            string originalMainComponentContent = null;
             try
             {
                 this.UpdateActiveCodeFileContent();
-
-                // Add the necessary main component code prefix and store the original content so we can revert right after compilation.
-                if (this.CodeFiles.TryGetValue(CoreConstants.MainComponentFilePath, out mainComponent))
-                {
-                    originalMainComponentContent = mainComponent.Content;
-                    mainComponent.Content = MainComponentCodePrefix + originalMainComponentContent.Replace(MainComponentCodePrefix, "");
-                }
 
                 compilationResult = await this.CompilationService.CompileToAssemblyAsync(
                     this.CodeFiles.Values,
@@ -193,21 +183,13 @@
             }
             finally
             {
-                if (mainComponent != null)
-                {
-                    mainComponent.Content = originalMainComponentContent;
-                }
-
                 this.Loading = false;
             }
 
             if (compilationResult?.AssemblyBytes?.Length > 0)
             {
-                // Make sure the DLL is updated before reloading the user page
                 this.JsRuntime.InvokeVoid(Try.CodeExecution.UpdateUserComponentsDll, compilationResult.AssemblyBytes);
-
-                // TODO: Add error page in iframe
-                this.JsRuntime.InvokeVoid(Try.ReloadIframe, "user-page-window", MainUserPagePath);
+                this.JsRuntime.InvokeVoid(Try.CodeExecution.HotReloadIframe, "user-page-window", MainUserPagePath);
             }
         }
 
