@@ -65,6 +65,7 @@
                 typeof(AssemblyTargetedPatchBandAttribute).Assembly, // System.Private.CoreLib
                 typeof(NavLink).Assembly, // Microsoft.AspNetCore.Components.Web
                 typeof(IQueryable).Assembly, // System.Linq.Expressions
+                typeof(Queryable).Assembly, // System.Linq.Queryable
                 typeof(HttpClientJsonExtensions).Assembly, // System.Net.Http.Json
                 typeof(HttpClient).Assembly, // System.Net.Http
                 typeof(IJSRuntime).Assembly, // Microsoft.JSInterop
