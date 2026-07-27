@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "commitMessagePrefix": "Build: ",
+  "packageRules": [
+    {
+      "description": "Group non-major NuGet updates into a single PR",
+      "matchManagers": ["nuget"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "NuGet packages (non-major)"
+    },
+    {
+      "description": "Group GitHub Actions updates into a single PR",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Framework-versioned packages track the TFM in Directory.Build.props; majors belong to a TFM upgrade, so require dependency dashboard approval",
+      "matchPackageNames": ["Microsoft.AspNetCore.*", "System.Net.Http.Json"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "The Roslyn/Razor compiler toolchain powers in-browser compilation and its pinned prerelease versions must move in lockstep (see #190); group and require dependency dashboard approval",
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis.*",
+        "Microsoft.Net.Compilers.Razor.Toolset",
+        "Microsoft.DotNet.Arcade.Sdk"
+      ],
+      "groupName": "Razor compiler toolchain",
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "MudBlazor floats at * so the playground always runs the latest release; nothing for Renovate to manage",
+      "matchPackageNames": ["MudBlazor"],
+      "enabled": false
+    }
+  ]
+}
