@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.CodeAnalysis;
@@ -82,6 +83,12 @@
                 return $"v{v.Major}.{v.Minor}.{v.Build}";
             }
         }
+
+        // The SDK's built-in Source Link appends "+{commit sha}" to the informational version.
+        // It's absent when building without a git repository, in which case we hide the link.
+        private static string CommitSha { get; } = Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion.Split('+') is [_, { Length: 40 } sha] ? sha : null;
 
         [JSInvokable]
         public async Task TriggerCompileAsync()

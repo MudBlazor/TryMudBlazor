@@ -83,6 +83,10 @@
         <MudSpacer />
         <MudLink Typo="Typo.body2" Class="ml-10 version-info" Color="Color.Inherit" Href="https://dotnet.microsoft.com/download" Target="_blank">.net @Environment.Version.ToString()</MudLink>
         <MudLink Typo="Typo.body2" Class="ml-5 version-info" Color="Color.Inherit" Href="https://github.com/MudBlazor/MudBlazor/releases" Target="_blank">mudblazor @Version</MudLink>
+        @if (CommitSha is not null)
+        {
+            <MudLink Typo="Typo.body2" Class="ml-5 version-info" Color="Color.Inherit" Href="@($"https://github.com/MudBlazor/TryMudBlazor/commit/{CommitSha}")" Target="_blank">trymudblazor @CommitSha[..7]</MudLink>
+        }
     </MudAppBar>
 </div>
 @code {

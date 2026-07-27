@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using System.Reflection
 
 <MudLayout Class="try-mudblazor-index">
     <MudAppBar Color="Color.Transparent" Fixed="false" Elevation="0">
@@ -144,12 +143,6 @@
                         <li>
                             <MudLink Typo="Typo.body2" Href="https://github.com/MudBlazor/TryMudBlazor">Source Code</MudLink>
                         </li>
-                        @if (CommitSha is not null)
-                        {
-                            <li>
-                                <MudLink Typo="Typo.body2" Href="@($"https://github.com/MudBlazor/TryMudBlazor/commit/{CommitSha}")" Target="_blank">Version @CommitSha[..7]</MudLink>
-                            </li>
-                        }
                     </ul>
                 </MudItem>
             </MudGrid>
@@ -158,12 +151,6 @@
     </MudMainContent>
 </MudLayout>
 
-@code {
-    string Version { get { var v = typeof(MudText).Assembly.GetName().Version; return $"v{v.Major}.{v.Minor}.{v.Build}"; } }
-
-    // The SDK's built-in Source Link appends "+{commit sha}" to the informational version.
-    // It's absent when building without a git repository, in which case we hide the link.
-    static string CommitSha { get; } = Assembly.GetExecutingAssembly()
-        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-        ?.InformationalVersion.Split('+') is [_, { Length: 40 } sha] ? sha : null;
+@code { 
+    string Version { get { var v = typeof(MudText).Assembly.GetName().Version; return $"v{v.Major}.{v.Minor}.{v.Build}"; } } 
 }
