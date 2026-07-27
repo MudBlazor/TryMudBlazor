@@ -31,8 +31,7 @@
       "matchManagers": ["nuget"],
       "matchPackageNames": [
         "Microsoft.CodeAnalysis.*",
-        "Microsoft.Net.Compilers.Razor.Toolset",
-        "Microsoft.DotNet.Arcade.Sdk"
+        "Microsoft.Net.Compilers.Razor.Toolset"
       ],
       "groupName": "Razor compiler toolchain",
       "dependencyDashboardApproval": true
