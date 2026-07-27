@@ -1,0 +1,58 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "commitMessagePrefix": "Build: ",
+  "packageRules": [
+    {
+      "description": "Group the Azure SDK packages together",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Azure.*"],
+      "groupName": "Azure SDK"
+    },
+    {
+      "description": "ASP.NET Core and System packages ship with the runtime and must move together",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Microsoft.AspNetCore.*", "System.*"],
+      "groupName": "ASP.NET Core and System"
+    },
+    {
+      "description": "Test packages move together so the runner and adapter stay compatible",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["NUnit*", "Microsoft.NET.Test.Sdk"],
+      "groupName": "Test packages"
+    },
+    {
+      "description": "The Roslyn/Razor compiler toolchain powers in-browser compilation and its pinned prerelease versions must move in lockstep (see #190); require dependency dashboard approval",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis.*",
+        "Microsoft.Net.Compilers.Razor.Toolset",
+        "Microsoft.DotNet.Arcade.Sdk"
+      ],
+      "groupName": "Razor compiler toolchain",
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Framework-versioned packages track the TFM in Directory.Build.props; majors belong to a TFM upgrade, so require dependency dashboard approval",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Microsoft.AspNetCore.*", "System.*"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "MudBlazor floats at * so the playground always runs the latest release; nothing for Renovate to manage",
+      "matchPackageNames": ["MudBlazor"],
+      "enabled": false
+    },
+    {
+      "description": "Group GitHub Actions updates into a single PR",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    }
+  ]
+}

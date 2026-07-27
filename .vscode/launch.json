@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "api only",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/TryMudBlazor.Server/bin/Debug/net9.0/TryMudBlazor.Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/TryMudBlazor.Server",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "api and wasm app",
+            "type": "blazorwasm",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "hosted": true,
+            "program": "${workspaceFolder}/src/TryMudBlazor.Server/bin/Debug/net9.0/TryMudBlazor.Server.dll",
+            "cwd": "${workspaceFolder}/src/TryMudBlazor.Server",
+            "browser": "edge",
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    ]
+}

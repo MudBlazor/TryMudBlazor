@@ -1,0 +1,14 @@
+name: build-test-trymudblazor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-test:
+    name: Build and test trymudblazor projects
+    uses: MudBlazor/Workflows/.github/workflows/template-build-test.yml@main
+    with:
+      publish-coverage: true

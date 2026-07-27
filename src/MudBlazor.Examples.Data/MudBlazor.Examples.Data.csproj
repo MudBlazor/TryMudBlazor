@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--Used for the periodic table examples-->
+  <ItemGroup>
+    <EmbeddedResource Include="Elements.json" />
+  </ItemGroup>
+
+</Project>
