@@ -15,12 +15,6 @@
       "groupName": "Azure SDK"
     },
     {
-      "description": "FluentValidation gets its own PR",
-      "matchManagers": ["nuget"],
-      "matchPackageNames": ["FluentValidation"],
-      "groupName": "FluentValidation"
-    },
-    {
       "description": "ASP.NET Core and System packages ship with the runtime and must move together",
       "matchManagers": ["nuget"],
       "matchPackageNames": ["Microsoft.AspNetCore.*", "System.*"],
