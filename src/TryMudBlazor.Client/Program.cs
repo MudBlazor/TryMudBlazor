@@ -5,7 +5,6 @@ namespace TryMudBlazor.Client
     using System.Net.Http;
     using System.Reflection;
     using System.Threading.Tasks;
-    using Blazored.LocalStorage;
     using Microsoft.AspNetCore.Components.Web;
     using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
     using Microsoft.AspNetCore.Components.WebAssembly.Services;
@@ -41,7 +40,6 @@ namespace TryMudBlazor.Client
 
             builder.Logging.Services.AddSingleton<ILoggerProvider, HandleCriticalUserComponentExceptionsLoggerProvider>();
             builder.Services.AddMudServices();
-            builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             builder.Services.AddScoped<LayoutService>();
 

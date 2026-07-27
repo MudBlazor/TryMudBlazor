@@ -1,7 +1,8 @@
-﻿namespace TryMudBlazor.Client.Services.UserPreferences;
+namespace TryMudBlazor.Client.Services.UserPreferences;
 
+using System.Text.Json;
 using System.Threading.Tasks;
-using Blazored.LocalStorage;
+using Microsoft.JSInterop;
 
 public interface IUserPreferencesService
 {
@@ -20,21 +21,38 @@ public interface IUserPreferencesService
 
 public class UserPreferencesService : IUserPreferencesService
 {
-    private readonly ILocalStorageService _localStorage;
+    private readonly IJSRuntime _jsRuntime;
     private const string Key = "userPreferences";
 
-    public UserPreferencesService(ILocalStorageService localStorage)
+    public UserPreferencesService(IJSRuntime jsRuntime)
     {
-        _localStorage = localStorage;
+        _jsRuntime = jsRuntime;
     }
 
     public async Task SaveUserPreferences(UserPreferences userPreferences)
     {
-        await _localStorage.SetItemAsync(Key, userPreferences);
+        // Default serializer options keep the PascalCase property names that editor/main.js reads directly.
+        var json = JsonSerializer.Serialize(userPreferences);
+
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", Key, json);
     }
 
     public async Task<UserPreferences> LoadUserPreferences()
     {
-        return await _localStorage.GetItemAsync<UserPreferences>(Key);
+        var json = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", Key);
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<UserPreferences>(json);
+        }
+        catch (JsonException)
+        {
+            // Ignore preferences that can no longer be read and fall back to the defaults.
+            return null;
+        }
     }
 }
