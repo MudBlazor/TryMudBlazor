@@ -278,7 +278,8 @@
 
         private void ClearCache()
         {
-            NavigationManager.NavigateTo(NavigationManager.BaseUri, forceLoad: true);
+            this.JsRuntime.InvokeVoid(Try.CodeExecution.ClearUserComponentsDll);
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
     }
 }

@@ -50,6 +50,7 @@
         <div class="bottom-buttons">
             <MudTooltip Text="Clear cache" Placement="Placement.Right">
                 <MudIconButton OnClick="@ClearCache"
+                               aria-label="Clear cache"
                                Icon="@(LayoutService.IsDarkMode ? Icons.Material.Outlined.Cached : Icons.Material.Filled.Cached)"
                                Class="cache-button"
                                Color="@(LayoutService.IsDarkMode ? Color.Default : Color.Inherit)" />
