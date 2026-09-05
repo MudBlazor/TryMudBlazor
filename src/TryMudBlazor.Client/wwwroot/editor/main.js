@@ -4,27 +4,41 @@ let _dotNetInstance;
 
 const throttleLastTimeFuncNameMappings = {};
 
-function registerLangugageProvider(language) {
+// Completion snippets are static files; fetch each once and reuse the parsed JSON for every keystroke.
+const snippetFileCache = {};
+
+function loadSnippets(file) {
+    if (!snippetFileCache[file]) {
+        snippetFileCache[file] = fetch(file)
+            .then((response) => response.json())
+            .catch((error) => {
+                // Don't cache a failed fetch, or one network blip disables snippets until reload.
+                delete snippetFileCache[file];
+                throw error;
+            });
+    }
+
+    return snippetFileCache[file];
+}
+
+function registerLanguageProvider(language) {
     monaco.languages.registerCompletionItemProvider(language, {
         provideCompletionItems: async function (model, position) {
-            var textUntilPosition = model.getValueInRange({
+            const textUntilPosition = model.getValueInRange({
                 startLineNumber: 1,
                 startColumn: 1,
                 endLineNumber: position.lineNumber,
                 endColumn: position.column,
             });
 
-            if(language == 'razor')
-            {
-                if ((textUntilPosition.match(/{/g) || []).length !== (textUntilPosition.match(/}/g) || []).length) {
-                    var data = await fetch("editor/snippets/csharp.json").then((response) => response.json());
-                } else {
-                    var data = await fetch("editor/snippets/mudblazor.json").then((response) => response.json());
-                }
-            }else {
-                var data = await fetch("editor/snippets/csharp.json").then((response) => response.json());
-            }
-            
+            // Inside an unclosed brace of a .razor file the user is writing C#; otherwise offer component snippets.
+            const openBraces = (textUntilPosition.match(/{/g) || []).length;
+            const closeBraces = (textUntilPosition.match(/}/g) || []).length;
+            const snippetFile = language === 'razor' && openBraces === closeBraces
+                ? "editor/snippets/mudblazor.json"
+                : "editor/snippets/csharp.json";
+            const data = await loadSnippets(snippetFile);
+
             var word = model.getWordUntilPosition(position);
             var range = {
                 startLineNumber: position.lineNumber,
@@ -166,8 +180,8 @@ window.Try.Editor = window.Try.Editor || (function () {
                     documentRangeFormattingEdits: true,
                 });
 
-                registerLangugageProvider('razor');
-                registerLangugageProvider('csharp');
+                registerLanguageProvider('razor');
+                registerLanguageProvider('csharp');
             })
         },
         getValue: function () {

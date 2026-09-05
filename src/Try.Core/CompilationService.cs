@@ -199,22 +199,22 @@
 
             var finalCompilation = _baseCompilation.AddSyntaxTrees(syntaxTrees);
 
-            var compilationDiagnostics = finalCompilation.GetDiagnostics().Where(d => d.Severity > DiagnosticSeverity.Info);
+            // Emit reports the same diagnostics GetDiagnostics would, so a single pass does both jobs.
+            using var peStream = new MemoryStream(capacity: 512 * 1024);
+            var emitResult = finalCompilation.Emit(peStream);
 
             var result = new CompileToAssemblyResult
             {
                 Compilation = finalCompilation,
-                Diagnostics = compilationDiagnostics
+                Diagnostics = emitResult.Diagnostics
+                    .Where(d => d.Severity > DiagnosticSeverity.Info)
                     .Select(CompilationDiagnostic.FromCSharpDiagnostic)
                     .Concat(cSharpResults.SelectMany(r => r.Diagnostics))
                     .ToList(),
             };
 
-            if (result.Diagnostics.All(x => x.Severity != DiagnosticSeverity.Error))
+            if (emitResult.Success)
             {
-                using var peStream = new MemoryStream(capacity: 512 * 1024);
-                finalCompilation.Emit(peStream);
-
                 result.AssemblyBytes = peStream.ToArray();
             }
 
