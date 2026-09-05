@@ -1,18 +1,23 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace MudBlazor.Examples.Data.Models
 {
+    /// <summary>
+    /// A row of the periodic table. Values are set once when the table is deserialised and never change, which
+    /// lets PeriodicTableService hand the same instances to every request.
+    /// </summary>
     public class Element
     {
-        public string Group { get; set; }
-        public int Position { get; set; }
-        public string Name { get; set; }
-        public int Number { get; set; }
+        public string Group { get; init; }
+        public int Position { get; init; }
+        public string Name { get; init; }
+        public int Number { get; init; }
 
         [JsonPropertyName("small")]
-        public string Sign { get; set; }
-        public double Molar { get; set; }
-        public IList<int> Electrons { get; set; }
+        public string Sign { get; init; }
+        public double Molar { get; init; }
+        public ImmutableArray<int> Electrons { get; init; }
 
         /// <summary>
         /// Overriding Equals is essential for use with Select and Table because they use HashSets internally

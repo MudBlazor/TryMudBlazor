@@ -58,19 +58,21 @@ public static class SnippetsEncoder
         ['Z'] = '9',
     };
 
+    // Index 0-9: every letter that stands for that digit.
+    private static readonly string[] LettersForDigit = Enumerable.Range(0, 10)
+        .Select(digit => new string(LetterToDigitIdMappings.Where(kv => kv.Value == (char)('0' + digit)).Select(kv => kv.Key).ToArray()))
+        .ToArray();
+
     public static string EncodeSnippetId(string snippetId)
     {
-        var encoded = string.Empty;
-
-        foreach (var digit in snippetId)
+        return string.Create(snippetId.Length, snippetId, static (encoded, digits) =>
         {
-            var choiceOfLetters = LetterToDigitIdMappings.Where(kv => kv.Value == digit).ToArray();
-            var letter = choiceOfLetters.Skip(Random.Shared.Next(choiceOfLetters.Length)).First();
-
-            encoded += letter.Key;
-        }
-
-        return encoded;
+            for (var i = 0; i < digits.Length; i++)
+            {
+                var letters = LettersForDigit[digits[i] - '0'];
+                encoded[i] = letters[Random.Shared.Next(letters.Length)];
+            }
+        });
     }
 
     public const int SnippetIdLength = 16;
@@ -86,18 +88,15 @@ public static class SnippetsEncoder
             throw new InvalidDataException("Invalid snippet ID");
         }
 
-        var decoded = string.Empty;
-
-        foreach (var letter in encoded)
+        var decoded = new char[SnippetIdLength];
+        for (var i = 0; i < encoded.Length; i++)
         {
-            if (!LetterToDigitIdMappings.TryGetValue(letter, out var digit))
+            if (!LetterToDigitIdMappings.TryGetValue(encoded[i], out decoded[i]))
             {
                 throw new InvalidDataException("Invalid snippet ID");
             }
-
-            decoded += digit;
         }
 
-        return decoded;
+        return new string(decoded);
     }
 }
