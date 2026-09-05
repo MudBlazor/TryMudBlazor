@@ -135,7 +135,6 @@ window.Try = {
 window.Try.Editor = window.Try.Editor || (function () {
     let _editor;
     let _overrideValue;
-    let _readyCallbacks = [];
 
     return {
         create: function (id, value, language) {
@@ -165,10 +164,6 @@ window.Try.Editor = window.Try.Editor || (function () {
                 });
 
                 _overrideValue = null;
-
-                const callbacks = _readyCallbacks;
-                _readyCallbacks = [];
-                callbacks.forEach(callback => callback());
 
                 monaco.languages.html.razorDefaults.setModeConfiguration({
                     completionItems: true,
@@ -203,20 +198,8 @@ window.Try.Editor = window.Try.Editor || (function () {
         setTheme: function (theme) {
             monaco.editor.setTheme(theme);
         },
-        // Runs WarmUpCompilerAsync on the given .NET object once the editor exists and the browser is idle.
-        whenReady: function (dotNetInstance) {
-            const schedule = window.requestIdleCallback || ((callback) => setTimeout(callback, 500));
-            const fire = () => schedule(() => dotNetInstance.invokeMethodAsync('WarmUpCompilerAsync'), { timeout: 3000 });
-
-            if (_editor) {
-                fire();
-            } else {
-                _readyCallbacks.push(fire);
-            }
-        },
         dispose: function () {
             _editor = null;
-            _readyCallbacks = [];
         }
     }
 }());

@@ -87,11 +87,6 @@
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion.Split('+') is [_, { Length: 40 } sha] ? sha : null;
 
-        // Called from JS once Monaco exists and the browser reports idle time, so the warm-up does not
-        // delay the editor appearing or compete with the initial render.
-        [JSInvokable]
-        public Task WarmUpCompilerAsync() => this.CompilationService.WarmUpAsync();
-
         [JSInvokable]
         public async Task TriggerCompileAsync()
         {
@@ -112,7 +107,6 @@
             {
                 this.dotNetInstance = DotNetObjectReference.Create(this);
                 this.JsRuntime.InvokeVoid(Try.Initialize, this.dotNetInstance);
-                this.JsRuntime.InvokeVoid(Try.Editor.WhenReady, this.dotNetInstance);
             }
 
             if (!string.IsNullOrWhiteSpace(this.errorMessage))
