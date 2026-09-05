@@ -4,7 +4,6 @@
     {
         public const string Initialize = "Try.initialize";
         public const string ChangeDisplayUrl = "Try.changeDisplayUrl";
-        public const string ReloadIframe = "Try.reloadIframe";
         public const string Dispose = "Try.dispose";
         public static class Editor
         {

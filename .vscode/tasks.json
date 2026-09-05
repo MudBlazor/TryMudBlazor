@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/BlazorRepl.sln",
+                "${workspaceFolder}/src/TryMudBlazor.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Client/BlazorRepl.Client.csproj",
+                "${workspaceFolder}/src/TryMudBlazor.Server/TryMudBlazor.Server.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,8 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Client/BlazorRepl.Client.csproj",
+                "--project",
+                "${workspaceFolder}/src/TryMudBlazor.Server/TryMudBlazor.Server.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

@@ -1,4 +1,4 @@
-# Contributing to Blazor REPL
+# Contributing to TryMudBlazor
 We value your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
 - Reporting bugs
@@ -6,7 +6,7 @@ We value your input! We want to make contributing to this project as easy and tr
 - Joining discussions in issues
 - Submitting Pull Requests for fixes or features
 
-## We use GitHub [Pull Requests](https://github.com/BlazorRepl/BlazorRepl/pulls) for accepting code changes 
+## We use GitHub [Pull Requests](https://github.com/MudBlazor/TryMudBlazor/pulls) for accepting code changes 
 
 1. Fork the repo and create your branch from `main`.
 2. Be consistent with the existing code
@@ -15,8 +15,8 @@ We value your input! We want to make contributing to this project as easy and tr
 5. Open a pull request.
 6. Collaborate with us on finalizing the PR throughout the code review process
 
-## Report bugs using Github's [issues](https://github.com/BlazorREPL/BlazorREPL/issues)
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/BlazorRepl/BlazorRepl/issues/new); it's that easy!
+## Report bugs using Github's [issues](https://github.com/MudBlazor/TryMudBlazor/issues)
+We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/MudBlazor/TryMudBlazor/issues/new); it's that easy!
 
 **Great Bug Reports** tend to have:
 
@@ -37,4 +37,4 @@ After submitting an issue, come back to it from time to time to check if we need
 When submitting a new feature request, ensure you include the detailed use cases you want to achieve. If you have a specific point of view of how this feature should look like do not hesitate to add it.
 
 ## Contributor License Agreement
-Any contributions you make will be under the [GNU General Public License v2.0](https://github.com/BlazorRepl/BlazorRepl/blob/master/LICENSE). In short, when you submit code changes, your submissions are understood to be under the same license that covers the project. By contributing, you agree that your contributions will be licensed under GNU General Public License v2.0. Feel free to contact the maintainers if that's a concern. 
+Any contributions you make will be under the [GNU General Public License v2.0](https://github.com/MudBlazor/TryMudBlazor/blob/main/LICENSE). In short, when you submit code changes, your submissions are understood to be under the same license that covers the project. By contributing, you agree that your contributions will be licensed under GNU General Public License v2.0. Feel free to contact the maintainers if that's a concern. 
