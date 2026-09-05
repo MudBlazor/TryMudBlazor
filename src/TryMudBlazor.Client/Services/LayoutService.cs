@@ -1,4 +1,4 @@
-﻿namespace TryMudBlazor.Client.Services;
+namespace TryMudBlazor.Client.Services;
 
 using System;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ public class LayoutService
 {
     private readonly IUserPreferencesService _userPreferencesService;
     private UserPreferences.UserPreferences _userPreferences;
+    private Task _initialization;
 
     public bool IsDarkMode { get; private set; } = false;
 
@@ -21,12 +22,30 @@ public class LayoutService
         IsDarkMode = value;
     }
 
-    public async Task ApplyUserPreferences(bool isDarkModeDefaultTheme)
+    /// <summary>
+    /// Loads the stored preferences once per app lifetime. Every layout awaits the same load, and a load that
+    /// finishes after the user has already toggled the theme leaves that choice alone (see <see cref="ToggleDarkMode"/>).
+    /// </summary>
+    public Task ApplyUserPreferences(bool isDarkModeDefaultTheme)
     {
-        _userPreferences = await _userPreferencesService.LoadUserPreferences();
+        return _initialization ??= LoadUserPreferencesAsync(isDarkModeDefaultTheme);
+    }
+
+    private async Task LoadUserPreferencesAsync(bool isDarkModeDefaultTheme)
+    {
+        var storedPreferences = await _userPreferencesService.LoadUserPreferences();
+
         if (_userPreferences != null)
         {
-            IsDarkMode = _userPreferences.DarkTheme;
+            // The user toggled the theme while the load was in flight. That choice is newer than anything
+            // in storage, and ToggleDarkMode has already saved it, so the older value must not replace it.
+            return;
+        }
+
+        if (storedPreferences != null)
+        {
+            _userPreferences = storedPreferences;
+            IsDarkMode = storedPreferences.DarkTheme;
         }
         else
         {
@@ -40,9 +59,14 @@ public class LayoutService
 
     private void OnMajorUpdateOccured() => MajorUpdateOccured?.Invoke(this, EventArgs.Empty);
 
+    /// <summary>
+    /// Flips the theme relative to what the user currently sees and persists it. Works before, during and after
+    /// the initial load; a load still in flight will not overwrite the result.
+    /// </summary>
     public async Task ToggleDarkMode()
     {
         IsDarkMode = !IsDarkMode;
+        _userPreferences ??= new UserPreferences.UserPreferences();
         _userPreferences.DarkTheme = IsDarkMode;
         await _userPreferencesService.SaveUserPreferences(_userPreferences);
         OnMajorUpdateOccured();
