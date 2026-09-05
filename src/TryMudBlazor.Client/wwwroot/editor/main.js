@@ -146,14 +146,15 @@ window.Try.Editor = window.Try.Editor || (function () {
     return {
         create: function (id, value, language) {
             if (!id) { return; }
-            let _theme = "default";
-            let userPreferences = localStorage.getItem("userPreferences");
-            if (userPreferences) {
-                const userPreferencesJSON = JSON.parse(userPreferences);
-                if (userPreferencesJSON.hasOwnProperty("DarkTheme") && userPreferencesJSON.DarkTheme) {
-                    _theme = "vs-dark";
+            // Match the rule LayoutService applies: a stored preference wins, otherwise follow the OS.
+            let darkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            try {
+                const userPreferences = JSON.parse(localStorage.getItem("userPreferences"));
+                if (typeof userPreferences?.DarkTheme === 'boolean') {
+                    darkTheme = userPreferences.DarkTheme;
                 }
-            }
+            } catch { /* unreadable preferences fall back to the OS setting */ }
+            const _theme = darkTheme ? "vs-dark" : "default";
 
             require(['vs/editor/editor.main'], () => {
                 _editor = monaco.editor.create(document.getElementById(id), {
