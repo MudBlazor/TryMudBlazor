@@ -57,7 +57,7 @@ public class SnippetsController : ControllerBase
             return Problem(statusCode: StatusCodes.Status400BadRequest, detail: "Invalid snippet ID.");
         }
 
-        var blob = _containerClient.GetBlobClient(BlobPath(decodedSnippetId));
+        var blob = _containerClient.GetBlobClient(SnippetIds.BlobPath(decodedSnippetId));
         var zipStream = new MemoryStream();
         try
         {
@@ -89,34 +89,29 @@ public class SnippetsController : ControllerBase
             return Problem(statusCode: StatusCodes.Status400BadRequest, detail: validationError);
         }
 
-        archiveStream.Position = 0;
-
-        var newSnippetId = NewSnippetId();
-        await _containerClient.UploadBlobAsync(BlobPath(newSnippetId), archiveStream);
+        var newSnippetId = await UploadWithFreshIdAsync(archiveStream);
 
         return Ok(EncodeSnippetId(newSnippetId));
     }
 
-    private static string NewSnippetId()
+    // IDs are the millisecond of the day, so two saves in the same millisecond collide and the second
+    // upload fails with 409 BlobAlreadyExists. Retry with a fresh ID rather than failing the save.
+    private async Task<string> UploadWithFreshIdAsync(MemoryStream archiveStream)
     {
-        var yearFolder = DateTime.Now.Year;
-        var monthFolder = DateTime.Now.Month;
-        var dayFolder = DateTime.Now.Day;
-        var time = Convert.ToInt32(DateTime.Now.TimeOfDay.TotalMilliseconds);
-        var snippetTime = $"{time:D8}";
-
-        return $"{yearFolder:0000}{monthFolder:00}{dayFolder:00}{snippetTime:D8}";
-    }
-
-    private static string BlobPath(string snippetId)
-    {
-        var yearFolder = snippetId.Substring(0, 4);
-        var monthFolder = snippetId.Substring(4, 2);
-        var dayFolder = snippetId.Substring(6, 2);
-        var time = snippetId.Substring(8);
-        var snippetFolder = $"{yearFolder:0000}/{monthFolder:00}/{dayFolder:00}";
-        var snippetTime = $"{time:00000000}";
-
-        return $"{snippetFolder}/{snippetTime}";
+        const int attempts = 5;
+        for (var attempt = 1; ; attempt++)
+        {
+            var snippetId = SnippetIds.New();
+            archiveStream.Position = 0;
+            try
+            {
+                await _containerClient.UploadBlobAsync(SnippetIds.BlobPath(snippetId), archiveStream);
+                return snippetId;
+            }
+            catch (RequestFailedException exception) when (exception.Status == StatusCodes.Status409Conflict && attempt < attempts)
+            {
+                await Task.Delay(1);
+            }
+        }
     }
 }
