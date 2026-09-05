@@ -3,7 +3,6 @@
     public static class Try
     {
         public const string Initialize = "Try.initialize";
-        public const string ChangeDisplayUrl = "Try.changeDisplayUrl";
         public const string Dispose = "Try.dispose";
         public static class Editor
         {
