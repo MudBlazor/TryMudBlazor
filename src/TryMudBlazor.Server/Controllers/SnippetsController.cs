@@ -1,5 +1,3 @@
-using Azure;
-using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using TryMudBlazor.Server.Utilities;
 using static TryMudBlazor.Server.Utilities.SnippetsEncoder;
@@ -10,11 +8,19 @@ namespace TryMudBlazor.Server.Controllers;
 [ApiController]
 public class SnippetsController : ControllerBase
 {
-    private readonly BlobContainerClient _containerClient;
+    /// <summary>
+    /// After the timestamp candidate every retry is random within a space of 10^8 per day, so a few attempts
+    /// are plenty, and the budget keeps the storage work one anonymous request can cause bounded.
+    /// </summary>
+    public const int MaxSaveAttempts = 5;
 
-    public SnippetsController(BlobContainerClient containerClient)
+    private readonly ISnippetStore _store;
+    private readonly SnippetIdAllocator _idAllocator;
+
+    public SnippetsController(ISnippetStore store, SnippetIdAllocator idAllocator)
     {
-        _containerClient = containerClient;
+        _store = store;
+        _idAllocator = idAllocator;
     }
 
     [HttpGet("{snippetId}")]
@@ -30,30 +36,24 @@ public class SnippetsController : ControllerBase
             return Problem(statusCode: StatusCodes.Status400BadRequest, detail: "Invalid snippet ID.");
         }
 
-        var blob = _containerClient.GetBlobClient(BlobPath(decodedSnippetId));
-        var zipStream = new MemoryStream();
-        try
-        {
-            var response = await blob.DownloadAsync();
-            await response.Value.Content.CopyToAsync(zipStream);
-        }
-        catch (RequestFailedException exception) when (exception.Status == StatusCodes.Status404NotFound)
+        var archive = await _store.DownloadAsync(BlobPath(decodedSnippetId), HttpContext.RequestAborted);
+        if (archive is null)
         {
             return NotFound();
         }
 
-        zipStream.Position = 0;
-
-        return File(zipStream, "application/octet-stream", "snippet.zip");
+        return File(archive, "application/octet-stream", "snippet.zip");
     }
 
     [HttpPost]
     [RequestSizeLimit(SnippetArchiveValidator.MaxArchiveBytes)]
     public async Task<IActionResult> Post()
     {
+        var cancellationToken = HttpContext.RequestAborted;
+
         // Buffer the upload so it can be validated before anything reaches storage.
         var archiveStream = new MemoryStream();
-        await Request.Body.CopyToAsync(archiveStream);
+        await Request.Body.CopyToAsync(archiveStream, cancellationToken);
         archiveStream.Position = 0;
 
         var validationError = SnippetArchiveValidator.Validate(archiveStream);
@@ -62,23 +62,20 @@ public class SnippetsController : ControllerBase
             return Problem(statusCode: StatusCodes.Status400BadRequest, detail: validationError);
         }
 
-        archiveStream.Position = 0;
+        for (var attempt = 1; attempt <= MaxSaveAttempts; attempt++)
+        {
+            archiveStream.Position = 0;
+            var snippetId = _idAllocator.NextCandidate(attempt);
+            if (await _store.TryUploadAsync(BlobPath(snippetId), archiveStream, cancellationToken))
+            {
+                return Ok(EncodeSnippetId(snippetId));
+            }
+        }
 
-        var newSnippetId = NewSnippetId();
-        await _containerClient.UploadBlobAsync(BlobPath(newSnippetId), archiveStream);
-
-        return Ok(EncodeSnippetId(newSnippetId));
-    }
-
-    private static string NewSnippetId()
-    {
-        var yearFolder = DateTime.Now.Year;
-        var monthFolder = DateTime.Now.Month;
-        var dayFolder = DateTime.Now.Day;
-        var time = Convert.ToInt32(DateTime.Now.TimeOfDay.TotalMilliseconds);
-        var snippetTime = $"{time:D8}";
-
-        return $"{yearFolder:0000}{monthFolder:00}{dayFolder:00}{snippetTime:D8}";
+        // Storage answered every time; we just did not find a free ID within budget. That is a retry for the
+        // client, not a server fault, so say so instead of letting a storage exception become a 500.
+        Response.Headers.RetryAfter = "1";
+        return Problem(statusCode: StatusCodes.Status503ServiceUnavailable, detail: "Could not allocate an ID for the snippet. Please try again.");
     }
 
     private static string BlobPath(string snippetId)
