@@ -73,8 +73,19 @@ public static class SnippetsEncoder
         return encoded;
     }
 
+    public const int SnippetIdLength = 16;
+
+    /// <summary>
+    /// Decodes a public snippet ID back to the 16-digit storage ID.
+    /// </summary>
+    /// <exception cref="InvalidDataException">The ID has the wrong length or contains characters outside the alphabet.</exception>
     public static string DecodeSnippetId(string encoded)
     {
+        if (encoded is null || encoded.Length != SnippetIdLength)
+        {
+            throw new InvalidDataException("Invalid snippet ID");
+        }
+
         var decoded = string.Empty;
 
         foreach (var letter in encoded)
