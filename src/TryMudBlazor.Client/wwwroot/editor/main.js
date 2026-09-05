@@ -9,7 +9,13 @@ const snippetFileCache = {};
 
 function loadSnippets(file) {
     if (!snippetFileCache[file]) {
-        snippetFileCache[file] = fetch(file).then((response) => response.json());
+        snippetFileCache[file] = fetch(file)
+            .then((response) => response.json())
+            .catch((error) => {
+                // Don't cache a failed fetch, or one network blip disables snippets until reload.
+                delete snippetFileCache[file];
+                throw error;
+            });
     }
 
     return snippetFileCache[file];
