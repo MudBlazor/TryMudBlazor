@@ -94,8 +94,6 @@ public class SnippetsController : ControllerBase
         return Ok(EncodeSnippetId(newSnippetId));
     }
 
-    // IDs are the millisecond of the day, so two saves in the same millisecond collide and the second
-    // upload fails with 409 BlobAlreadyExists. Retry with a fresh ID rather than failing the save.
     private async Task<string> UploadWithFreshIdAsync(MemoryStream archiveStream)
     {
         const int attempts = 5;
