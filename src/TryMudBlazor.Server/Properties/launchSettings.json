@@ -21,7 +21,7 @@
     },
     "Server": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
       "hotReloadEnabled": false,
       "launchUrl": "",
