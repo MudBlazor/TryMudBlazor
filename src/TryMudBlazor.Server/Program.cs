@@ -9,7 +9,6 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddScoped<IPeriodicTableService, PeriodicTableService>();
-        // Built eagerly so a missing snippet configuration fails at startup rather than on the first save.
         builder.Services.AddSingleton(SnippetStorage.CreateContainerClient(builder.Configuration));
         builder.Services.AddCors(options =>
         {
