@@ -8,30 +8,31 @@ const throttleLastTimeFuncNameMappings = {};
 const snippetFileCache = {};
 
 function loadSnippets(file) {
-    return snippetFileCache[file] ??= fetch(file).then((response) => response.json());
+    if (!snippetFileCache[file]) {
+        snippetFileCache[file] = fetch(file).then((response) => response.json());
+    }
+
+    return snippetFileCache[file];
 }
 
 function registerLanguageProvider(language) {
     monaco.languages.registerCompletionItemProvider(language, {
         provideCompletionItems: async function (model, position) {
-            var textUntilPosition = model.getValueInRange({
+            const textUntilPosition = model.getValueInRange({
                 startLineNumber: 1,
                 startColumn: 1,
                 endLineNumber: position.lineNumber,
                 endColumn: position.column,
             });
 
-            if(language == 'razor')
-            {
-                if ((textUntilPosition.match(/{/g) || []).length !== (textUntilPosition.match(/}/g) || []).length) {
-                    var data = await loadSnippets("editor/snippets/csharp.json");
-                } else {
-                    var data = await loadSnippets("editor/snippets/mudblazor.json");
-                }
-            }else {
-                var data = await loadSnippets("editor/snippets/csharp.json");
-            }
-            
+            // Inside an unclosed brace of a .razor file the user is writing C#; otherwise offer component snippets.
+            const openBraces = (textUntilPosition.match(/{/g) || []).length;
+            const closeBraces = (textUntilPosition.match(/}/g) || []).length;
+            const snippetFile = language === 'razor' && openBraces === closeBraces
+                ? "editor/snippets/mudblazor.json"
+                : "editor/snippets/csharp.json";
+            const data = await loadSnippets(snippetFile);
+
             var word = model.getWordUntilPosition(position);
             var range = {
                 startLineNumber: position.lineNumber,
