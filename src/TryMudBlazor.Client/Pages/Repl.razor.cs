@@ -90,6 +90,12 @@
         [JSInvokable]
         public async Task TriggerCompileAsync()
         {
+            // Ctrl+S bypasses the disabled Run button, and CompilationService is not reentrant.
+            if (this.Loading)
+            {
+                return;
+            }
+
             await this.CompileAsync();
 
             this.StateHasChanged();
