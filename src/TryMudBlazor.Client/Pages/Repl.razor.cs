@@ -61,8 +61,6 @@
 
         private int WarningsCount => this.Diagnostics.Count(d => d.Severity == DiagnosticSeverity.Warning);
 
-        private bool AreDiagnosticsShown { get; set; }
-
         private string LoaderText { get; set; }
 
         private bool Loading { get; set; }
@@ -72,7 +70,6 @@
         private void ToggleDiagnostics()
         {
             ShowDiagnostics = !ShowDiagnostics;
-            AreDiagnosticsShown = ShowDiagnostics;
         }
 
         private string Version
@@ -181,7 +178,7 @@
                     this.UpdateLoaderTextAsync);
 
                 this.Diagnostics = compilationResult.Diagnostics.OrderByDescending(x => x.Severity).ThenBy(x => x.Code).ToList();
-                this.AreDiagnosticsShown = true;
+                this.ShowDiagnostics = this.ErrorsCount > 0 || this.WarningsCount > 0;
             }
             catch (Exception e)
             {
