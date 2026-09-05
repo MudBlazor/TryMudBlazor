@@ -14,6 +14,7 @@
             public const string SetLangugage = "Try.Editor.setLanguage";
             public const string Focus = "Try.Editor.focus";
             public const string SetTheme = "Try.Editor.setTheme";
+            public const string WhenReady = "Try.Editor.whenReady";
             public const string Dispose = "Try.Editor.dispose";
         }
 

@@ -4,7 +4,14 @@ let _dotNetInstance;
 
 const throttleLastTimeFuncNameMappings = {};
 
-function registerLangugageProvider(language) {
+// Completion snippets are static files; fetch each once and reuse the parsed JSON for every keystroke.
+const snippetFileCache = {};
+
+function loadSnippets(file) {
+    return snippetFileCache[file] ??= fetch(file).then((response) => response.json());
+}
+
+function registerLanguageProvider(language) {
     monaco.languages.registerCompletionItemProvider(language, {
         provideCompletionItems: async function (model, position) {
             var textUntilPosition = model.getValueInRange({
@@ -17,12 +24,12 @@ function registerLangugageProvider(language) {
             if(language == 'razor')
             {
                 if ((textUntilPosition.match(/{/g) || []).length !== (textUntilPosition.match(/}/g) || []).length) {
-                    var data = await fetch("editor/snippets/csharp.json").then((response) => response.json());
+                    var data = await loadSnippets("editor/snippets/csharp.json");
                 } else {
-                    var data = await fetch("editor/snippets/mudblazor.json").then((response) => response.json());
+                    var data = await loadSnippets("editor/snippets/mudblazor.json");
                 }
             }else {
-                var data = await fetch("editor/snippets/csharp.json").then((response) => response.json());
+                var data = await loadSnippets("editor/snippets/csharp.json");
             }
             
             var word = model.getWordUntilPosition(position);
@@ -128,6 +135,7 @@ window.Try = {
 window.Try.Editor = window.Try.Editor || (function () {
     let _editor;
     let _overrideValue;
+    let _readyCallbacks = [];
 
     return {
         create: function (id, value, language) {
@@ -158,6 +166,10 @@ window.Try.Editor = window.Try.Editor || (function () {
 
                 _overrideValue = null;
 
+                const callbacks = _readyCallbacks;
+                _readyCallbacks = [];
+                callbacks.forEach(callback => callback());
+
                 monaco.languages.html.razorDefaults.setModeConfiguration({
                     completionItems: true,
                     diagnostics:  true,
@@ -166,8 +178,8 @@ window.Try.Editor = window.Try.Editor || (function () {
                     documentRangeFormattingEdits: true,
                 });
 
-                registerLangugageProvider('razor');
-                registerLangugageProvider('csharp');
+                registerLanguageProvider('razor');
+                registerLanguageProvider('csharp');
             })
         },
         getValue: function () {
@@ -191,8 +203,20 @@ window.Try.Editor = window.Try.Editor || (function () {
         setTheme: function (theme) {
             monaco.editor.setTheme(theme);
         },
+        // Runs WarmUpCompilerAsync on the given .NET object once the editor exists and the browser is idle.
+        whenReady: function (dotNetInstance) {
+            const schedule = window.requestIdleCallback || ((callback) => setTimeout(callback, 500));
+            const fire = () => schedule(() => dotNetInstance.invokeMethodAsync('WarmUpCompilerAsync'), { timeout: 3000 });
+
+            if (_editor) {
+                fire();
+            } else {
+                _readyCallbacks.push(fire);
+            }
+        },
         dispose: function () {
             _editor = null;
+            _readyCallbacks = [];
         }
     }
 }());

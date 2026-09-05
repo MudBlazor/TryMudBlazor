@@ -45,6 +45,7 @@
 
         private int _lastCodeHash;
         private CompileToAssemblyResult _cachedResult;
+        private Task _warmUpTask;
 
         private readonly RazorProjectFileSystem fileSystem = new VirtualRazorProjectFileSystem();
         private readonly RazorConfiguration configuration = new(
@@ -122,11 +123,57 @@
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Compiles the default snippet once so the first real run does not pay for JIT-ing Roslyn and the
+        /// Razor engine. It runs on the UI thread, so callers should start it when the page is idle; a
+        /// compile that starts while warm-up is in flight waits for it instead of racing it.
+        /// </summary>
+        public Task WarmUpAsync()
+        {
+            return _warmUpTask ??= WarmUpCoreAsync();
+        }
+
+        private async Task WarmUpCoreAsync()
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                var defaultFiles = new[]
+                {
+                    new CodeFile { Path = CoreConstants.MainComponentFilePath, Content = CoreConstants.MainComponentDefaultFileContent },
+                };
+
+                await CompileCoreAsync(defaultFiles, async status =>
+                {
+                    Console.WriteLine($"Compiler warm-up: {status} at {stopwatch.ElapsedMilliseconds} ms");
+                    await Task.Yield();
+                });
+                Console.WriteLine($"Compiler warm-up finished in {stopwatch.ElapsedMilliseconds} ms");
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine($"Compiler warm-up failed after {stopwatch.ElapsedMilliseconds} ms: {exception.Message}");
+            }
+        }
+
         public async Task<CompileToAssemblyResult> CompileToAssemblyAsync(
             ICollection<CodeFile> codeFiles,
             Func<string, Task> updateStatusFunc) // TODO: try convert to event
         {
             ArgumentNullException.ThrowIfNull(codeFiles);
+
+            // A user compile makes a later warm-up pointless, and one that is already running must finish
+            // first because both share the cache fields below.
+            var warmUp = _warmUpTask ??= Task.CompletedTask;
+            await warmUp;
+
+            return await CompileCoreAsync(codeFiles, updateStatusFunc);
+        }
+
+        private async Task<CompileToAssemblyResult> CompileCoreAsync(
+            ICollection<CodeFile> codeFiles,
+            Func<string, Task> updateStatusFunc)
+        {
 
             var codeHash = ComputeCodeHash(codeFiles);
             if (_cachedResult != null && _lastCodeHash == codeHash)
@@ -199,22 +246,22 @@
 
             var finalCompilation = _baseCompilation.AddSyntaxTrees(syntaxTrees);
 
-            var compilationDiagnostics = finalCompilation.GetDiagnostics().Where(d => d.Severity > DiagnosticSeverity.Info);
+            // Emit reports the same diagnostics GetDiagnostics would, so a single pass does both jobs.
+            using var peStream = new MemoryStream(capacity: 512 * 1024);
+            var emitResult = finalCompilation.Emit(peStream);
 
             var result = new CompileToAssemblyResult
             {
                 Compilation = finalCompilation,
-                Diagnostics = compilationDiagnostics
+                Diagnostics = emitResult.Diagnostics
+                    .Where(d => d.Severity > DiagnosticSeverity.Info)
                     .Select(CompilationDiagnostic.FromCSharpDiagnostic)
                     .Concat(cSharpResults.SelectMany(r => r.Diagnostics))
                     .ToList(),
             };
 
-            if (result.Diagnostics.All(x => x.Severity != DiagnosticSeverity.Error))
+            if (emitResult.Success)
             {
-                using var peStream = new MemoryStream(capacity: 512 * 1024);
-                finalCompilation.Emit(peStream);
-
                 result.AssemblyBytes = peStream.ToArray();
             }
 
