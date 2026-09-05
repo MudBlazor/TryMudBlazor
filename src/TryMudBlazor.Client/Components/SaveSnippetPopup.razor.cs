@@ -3,6 +3,7 @@ namespace TryMudBlazor.Client.Components
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
     using Microsoft.JSInterop;
@@ -64,6 +65,10 @@ namespace TryMudBlazor.Client.Components
             catch (InvalidOperationException ex)
             {
                 Snackbar.Add(ex.Message, Severity.Error);
+            }
+            catch (HttpRequestException)
+            {
+                Snackbar.Add("Could not save the snippet. Please try again later.", Severity.Error);
             }
             catch (Exception)
             {

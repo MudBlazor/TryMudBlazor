@@ -1,7 +1,9 @@
-﻿using Azure.Identity;
+using Azure;
+using Azure.Identity;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
+using TryMudBlazor.Server.Utilities;
 using static TryMudBlazor.Server.Utilities.SnippetsEncoder;
 
 namespace TryMudBlazor.Server.Controllers;
@@ -45,21 +47,52 @@ public class SnippetsController : ControllerBase
     [HttpGet("{snippetId}")]
     public async Task<IActionResult> Get(string snippetId)
     {
-        snippetId = DecodeSnippetId(snippetId);
-        var blob = _containerClient.GetBlobClient(BlobPath(snippetId));
-        var response = await blob.DownloadAsync();
+        string decodedSnippetId;
+        try
+        {
+            decodedSnippetId = DecodeSnippetId(snippetId);
+        }
+        catch (InvalidDataException)
+        {
+            return Problem(statusCode: StatusCodes.Status400BadRequest, detail: "Invalid snippet ID.");
+        }
+
+        var blob = _containerClient.GetBlobClient(BlobPath(decodedSnippetId));
         var zipStream = new MemoryStream();
-        await response.Value.Content.CopyToAsync(zipStream);
+        try
+        {
+            var response = await blob.DownloadAsync();
+            await response.Value.Content.CopyToAsync(zipStream);
+        }
+        catch (RequestFailedException exception) when (exception.Status == StatusCodes.Status404NotFound)
+        {
+            return NotFound();
+        }
+
         zipStream.Position = 0;
 
         return File(zipStream, "application/octet-stream", "snippet.zip");
     }
 
     [HttpPost]
+    [RequestSizeLimit(SnippetArchiveValidator.MaxArchiveBytes)]
     public async Task<IActionResult> Post()
     {
+        // Buffer the upload so it can be validated before anything reaches storage.
+        var archiveStream = new MemoryStream();
+        await Request.Body.CopyToAsync(archiveStream);
+        archiveStream.Position = 0;
+
+        var validationError = SnippetArchiveValidator.Validate(archiveStream);
+        if (validationError is not null)
+        {
+            return Problem(statusCode: StatusCodes.Status400BadRequest, detail: validationError);
+        }
+
+        archiveStream.Position = 0;
+
         var newSnippetId = NewSnippetId();
-        await _containerClient.UploadBlobAsync(BlobPath(newSnippetId), Request.Body);
+        await _containerClient.UploadBlobAsync(BlobPath(newSnippetId), archiveStream);
 
         return Ok(EncodeSnippetId(newSnippetId));
     }

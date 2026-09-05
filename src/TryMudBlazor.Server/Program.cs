@@ -16,6 +16,7 @@ public class Program
             });
         });
         builder.Services.AddControllers();
+        builder.Services.AddProblemDetails();
 
         var app = builder.Build();
 
@@ -26,7 +27,8 @@ public class Program
         }
         else
         {
-            app.UseExceptionHandler("/Error");
+            // Unhandled API errors become RFC 7807 responses; there is no /Error page to re-execute.
+            app.UseExceptionHandler();
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
@@ -42,18 +44,8 @@ public class Program
 
         app.MapControllers();
 
-        var version = GetVersion();
-        var cacheBusting = $"v{version.Major}.{version.Minor}.{version.Build}";
-        app.MapFallbackToFile("index.html")
-            .CacheOutput(policy => policy.SetVaryByQuery("cachebust", cacheBusting));
+        app.MapFallbackToFile("index.html");
 
         app.Run();
-    }
-
-    private static Version GetVersion()
-    {
-        var version = typeof(MudBlazor._Imports).Assembly.GetName().Version;
-
-        return version ?? new Version(0, 0, 0);
     }
 }
