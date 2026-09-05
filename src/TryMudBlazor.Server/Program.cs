@@ -1,4 +1,5 @@
 using MudBlazor.Examples.Data;
+using TryMudBlazor.Server.Utilities;
 
 namespace TryMudBlazor.Server;
 
@@ -8,6 +9,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddScoped<IPeriodicTableService, PeriodicTableService>();
+        builder.Services.AddSingleton(SnippetStorage.CreateContainerClient(builder.Configuration));
         builder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>

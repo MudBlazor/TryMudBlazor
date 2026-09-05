@@ -1,6 +1,4 @@
 using Azure;
-using Azure.Identity;
-using Azure.Storage;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using TryMudBlazor.Server.Utilities;
@@ -14,34 +12,9 @@ public class SnippetsController : ControllerBase
 {
     private readonly BlobContainerClient _containerClient;
 
-    public SnippetsController(IConfiguration config)
+    public SnippetsController(BlobContainerClient containerClient)
     {
-        var snippetsContainerUrl = config["SnippetsContainerUrl"];
-        var accessKey = config["SnippetsAccessKey"];
-
-        if (string.IsNullOrEmpty(snippetsContainerUrl) || string.IsNullOrEmpty(accessKey))
-        {
-            throw new Exception("Please configure SnippetsContainerUrl and SnippetsAccessKey in appsettings.json");
-        }
-
-        var containerUri = new Uri(snippetsContainerUrl);
-
-        if (accessKey == "secret")
-        {
-            var defaultAzureCredentialOptions = new DefaultAzureCredentialOptions
-            {
-                ManagedIdentityClientId = config["ManagedCredentialsId"]
-            };
-            _containerClient = new BlobContainerClient(containerUri,
-                new DefaultAzureCredential(defaultAzureCredentialOptions));
-        }
-        else
-        {
-            var blobUri = new BlobUriBuilder(containerUri);
-            var accountName = blobUri.AccountName;
-            var key = new StorageSharedKeyCredential(accountName, accessKey);
-            _containerClient = new BlobContainerClient(containerUri, key);
-        }
+        _containerClient = containerClient;
     }
 
     [HttpGet("{snippetId}")]
