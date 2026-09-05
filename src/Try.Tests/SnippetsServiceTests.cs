@@ -109,6 +109,17 @@ namespace Tests
             Assert.ThrowsAsync<HttpRequestException>(() => service.GetSnippetContentAsync(ValidSnippetId));
         }
 
+        [TestCase("a")]
+        [TestCase("")]
+        [TestCase("cacbacaeeafhcaf")]
+        [TestCase("cacbacaeeafhcafjj")]
+        [TestCase("cacbacaeeafhcaf1")]
+        [TestCase("cacbacaeeafhca-j")]
+        public void DecodeRejectsIdsOfTheWrongShape(string encoded)
+        {
+            Assert.Throws<InvalidDataException>(() => DecodeSnippetId(encoded));
+        }
+
         [Test]
         public void TestEncodeDecode()
         {
