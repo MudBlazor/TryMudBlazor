@@ -50,6 +50,7 @@
         <div class="bottom-buttons">
             <MudTooltip Text="Clear compiled output and reload" Placement="Placement.Right">
                 <MudIconButton OnClick="@ClearCache"
+                               AriaLabel="Clear compiled output and reload"
                                Icon="@(LayoutService.IsDarkMode ? Icons.Material.Outlined.Cached : Icons.Material.Filled.Cached)"
                                Class="cache-button"
                                Color="@(LayoutService.IsDarkMode ? Color.Default : Color.Inherit)" />
