@@ -83,9 +83,16 @@
             // netstandard facade is needed for libraries that target netstandard2.0
             assemblyNames.Add("netstandard");
 
-            var loadedByName = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic && a.GetName().Name != null)
-                .ToDictionary(a => a.GetName().Name!, StringComparer.OrdinalIgnoreCase);
+            // The same assembly name can be loaded into more than one load context (the test host does this),
+            // so keep the first one rather than letting ToDictionary throw.
+            var loadedByName = new Dictionary<string, System.Reflection.Assembly>(StringComparer.OrdinalIgnoreCase);
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (!assembly.IsDynamic && assembly.GetName().Name is { } name)
+                {
+                    loadedByName.TryAdd(name, assembly);
+                }
+            }
 
             var references = new List<MetadataReference>();
             foreach (var name in assemblyNames)
@@ -236,7 +243,7 @@
                 fullPath,
                 fileName,
                 FileKinds.Component,
-                Encoding.UTF8.GetBytes(fileContent.TrimStart()));
+                Encoding.UTF8.GetBytes(fileContent));
         }
 
         private async Task<IReadOnlyList<CompileToCSharpResult>> CompileToCSharpAsync(

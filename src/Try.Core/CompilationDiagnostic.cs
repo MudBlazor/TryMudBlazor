@@ -1,4 +1,4 @@
-﻿namespace Try.Core
+namespace Try.Core
 {
     using System.IO;
     using Microsoft.AspNetCore.Razor.Language;
@@ -12,6 +12,9 @@
 
         public string Description { get; set; }
 
+        /// <summary>
+        /// 1-based line in the user's source file, matching the editor gutter.
+        /// </summary>
         public int? Line { get; set; }
 
         public string File { get; set; }
@@ -25,20 +28,9 @@
                 return null;
             }
 
+            // The generated C# carries #line directives back to the .razor source, so the mapped
+            // span already points at the user's file. Roslyn lines are 0-based; the editor is 1-based.
             var mappedLineSpan = diagnostic.Location.GetMappedLineSpan();
-            var file = Path.GetFileName(mappedLineSpan.Path);
-            var line = mappedLineSpan.StartLinePosition.Line;
-
-            if (file != CoreConstants.MainComponentFilePath)
-            {
-                // Make it 1-based. Skip the main component where we add @page directive line
-                line++;
-            }
-            else
-            {
-                // Offset for MudProviders
-                line -= 4;
-            }
 
             return new CompilationDiagnostic
             {
@@ -46,8 +38,8 @@
                 Code = diagnostic.Descriptor.Id,
                 Severity = diagnostic.Severity,
                 Description = diagnostic.GetMessage(),
-                File = file,
-                Line = line,
+                File = Path.GetFileName(mappedLineSpan.Path),
+                Line = mappedLineSpan.StartLinePosition.Line + 1,
             };
         }
 
@@ -65,8 +57,7 @@
                 Severity = (DiagnosticSeverity)diagnostic.Severity,
                 Description = diagnostic.GetMessage(),
                 File = Path.GetFileName(diagnostic.Span.FilePath),
-
-                // Line = diagnostic.Span.LineIndex, // TODO: Find a way to calculate this
+                Line = diagnostic.Span.LineIndex + 1,
             };
         }
     }
