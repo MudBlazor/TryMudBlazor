@@ -278,8 +278,7 @@
 
         private void ClearCache()
         {
-            // Drop the compiled user assembly so the preview boots from the stock stub, then reload this
-            // page rather than bouncing to the landing page.
+            // Drop the compiled user assembly so the preview boots from the stock stub, then reload this page rather than bouncing to the landing page.
             this.JsRuntime.InvokeVoid(Try.CodeExecution.ClearUserComponentsDll);
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
