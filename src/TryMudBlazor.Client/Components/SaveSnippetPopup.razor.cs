@@ -55,8 +55,7 @@ namespace TryMudBlazor.Client.Components
                 var snippetId = await this.SnippetsService.SaveSnippetAsync(this.CodeFiles);
                 var urlBuilder = new UriBuilder(this.NavigationManager.BaseUri) { Path = $"snippet/{snippetId}" };
                 this.SnippetLink = urlBuilder.Uri.ToString();
-                // Same page component, so this only updates the address bar and NavigationManager.Uri;
-                // a later reload (e.g. Clear cache) then comes back to the saved snippet.
+                // Same page component, so this only updates the address bar and NavigationManager.Uri; a later reload (e.g. Clear cache) then comes back to the saved snippet.
                 this.NavigationManager.NavigateTo(this.SnippetLink, replace: true);
             }
             catch (InvalidOperationException ex)
