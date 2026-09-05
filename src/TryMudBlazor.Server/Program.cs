@@ -9,7 +9,10 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddScoped<IPeriodicTableService, PeriodicTableService>();
-        builder.Services.AddSingleton(SnippetStorage.CreateContainerClient(builder.Configuration));
+        builder.Services.AddSingleton<ISnippetStore>(new BlobSnippetStore(SnippetStorage.CreateContainerClient(builder.Configuration)));
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton(Random.Shared);
+        builder.Services.AddSingleton<SnippetIdAllocator>();
         builder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
