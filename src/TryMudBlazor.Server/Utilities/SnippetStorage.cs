@@ -7,8 +7,7 @@ namespace TryMudBlazor.Server.Utilities;
 public static class SnippetStorage
 {
     /// <summary>
-    /// Builds the container client once at startup. Creating it per request would also create a new
-    /// <see cref="DefaultAzureCredential"/> each time, and with it a fresh token acquisition on every save or load.
+    /// Builds the container client once at startup. Creating it per request would also create a new <see cref="DefaultAzureCredential"/> each time, and with it a fresh token acquisition on every save or load.
     /// </summary>
     public static BlobContainerClient CreateContainerClient(IConfiguration config)
     {
