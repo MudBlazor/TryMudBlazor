@@ -104,10 +104,6 @@ window.Try = {
         })
         window.addEventListener('keydown', onKeyDown);
     },
-    changeDisplayUrl: function (url) {
-        if (!url) {return; }
-        window.history.pushState(null, null, url);
-    },
     reloadIframe: function (id, newSrc) {
         const iFrame = document.getElementById(id);
         if (!iFrame) { return; }

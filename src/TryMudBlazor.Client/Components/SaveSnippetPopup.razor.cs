@@ -6,10 +6,8 @@ namespace TryMudBlazor.Client.Components
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
-    using Microsoft.JSInterop;
     using MudBlazor;
     using Try.Core;
-    using TryMudBlazor.Client.Models;
     using TryMudBlazor.Client.Services;
 
     public partial class SaveSnippetPopup
@@ -19,9 +17,6 @@ namespace TryMudBlazor.Client.Components
 
         [Inject]
         protected IJsApiService JsApiService { get; set; }
-
-        [Inject]
-        public IJSInProcessRuntime JsRuntime { get; set; }
 
         [Inject]
         public SnippetsService SnippetsService { get; set; }
@@ -60,7 +55,8 @@ namespace TryMudBlazor.Client.Components
                 var snippetId = await this.SnippetsService.SaveSnippetAsync(this.CodeFiles);
                 var urlBuilder = new UriBuilder(this.NavigationManager.BaseUri) { Path = $"snippet/{snippetId}" };
                 this.SnippetLink = urlBuilder.Uri.ToString();
-                this.JsRuntime.InvokeVoid(Try.ChangeDisplayUrl, SnippetLink);
+                // Same page component, so this only updates the address bar and NavigationManager.Uri; a later reload (e.g. Clear cache) then comes back to the saved snippet.
+                this.NavigationManager.NavigateTo(this.SnippetLink, replace: true);
             }
             catch (InvalidOperationException ex)
             {
