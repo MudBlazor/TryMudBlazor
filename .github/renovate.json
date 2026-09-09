@@ -44,6 +44,13 @@
       "dependencyDashboardApproval": true
     },
     {
+      "description": "Servicing releases only carry fixes and build-test-trymudblazor gates them, so merge them without review",
+      "matchManagers": ["nuget"],
+      "matchPackageNames": ["Microsoft.AspNetCore.*", "System.*"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
       "description": "MudBlazor floats at * so the playground always runs the latest release; nothing for Renovate to manage",
       "matchPackageNames": ["MudBlazor"],
       "enabled": false
