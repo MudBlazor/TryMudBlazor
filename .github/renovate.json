@@ -15,10 +15,16 @@
       "groupName": "Azure SDK"
     },
     {
-      "description": "ASP.NET Core and System packages ship with the runtime and must move together",
+      "description": "The playground exists to demo the current MudBlazor on the runtime it targets, so MudBlazor and the framework packages move together in one PR, majors included, and merge on a green build",
       "matchManagers": ["nuget"],
-      "matchPackageNames": ["Microsoft.AspNetCore.*", "System.*"],
-      "groupName": "ASP.NET Core and System"
+      "matchPackageNames": [
+        "MudBlazor",
+        "Microsoft.AspNetCore.*",
+        "System.*"
+      ],
+      "groupName": "MudBlazor and ASP.NET Core",
+      "separateMajorMinor": false,
+      "automerge": true
     },
     {
       "description": "Test packages move together so the runner and adapter stay compatible",
@@ -35,18 +41,6 @@
       ],
       "groupName": "Razor compiler toolchain",
       "dependencyDashboardApproval": true
-    },
-    {
-      "description": "Framework-versioned packages track the TFM in Directory.Build.props; majors belong to a TFM upgrade, so require dependency dashboard approval",
-      "matchManagers": ["nuget"],
-      "matchPackageNames": ["Microsoft.AspNetCore.*", "System.*"],
-      "matchUpdateTypes": ["major"],
-      "dependencyDashboardApproval": true
-    },
-    {
-      "description": "MudBlazor floats at * so the playground always runs the latest release; nothing for Renovate to manage",
-      "matchPackageNames": ["MudBlazor"],
-      "enabled": false
     },
     {
       "description": "Group GitHub Actions updates into a single PR",
