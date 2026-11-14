@@ -9,6 +9,11 @@
   "commitMessagePrefix": "Build: ",
   "packageRules": [
     {
+      "description": "Patch updates merge once CI passes; the playground only deploys when MudBlazor tags a release",
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
       "description": "Group the Azure SDK packages together",
       "matchManagers": ["nuget"],
       "matchPackageNames": ["Azure.*"],
@@ -34,7 +39,8 @@
         "Microsoft.Net.Compilers.Razor.Toolset"
       ],
       "groupName": "Razor compiler toolchain",
-      "dependencyDashboardApproval": true
+      "dependencyDashboardApproval": true,
+      "automerge": false
     },
     {
       "description": "Framework-versioned packages track the TFM in Directory.Build.props; majors belong to a TFM upgrade, so require dependency dashboard approval",
